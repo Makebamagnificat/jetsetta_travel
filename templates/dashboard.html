@@ -1,0 +1,90 @@
+<!-- templates/dashboard.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-6 py-12">
+    <div class="flex justify-between items-end mb-12">
+        <div>
+            <h1 class="text-5xl font-light tracking-tight">Welcome back, {{ current_user.name }}!</h1>
+            <p class="text-amber-300 mt-2">Here's what's happening with your trip</p>
+        </div>
+        <a href="{{ url_for('user.itineraries') }}" 
+           class="gold-button px-8 py-4 rounded-3xl">View Full Itinerary</a>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8">
+        <!-- Upcoming Itinerary -->
+        <div class="bg-zinc-900 rounded-3xl p-8">
+            <h2 class="text-2xl mb-6 flex items-center gap-3">
+                <span>📅</span> Your Itinerary
+            </h2>
+            {% if itineraries %}
+            <div class="space-y-6">
+                {% for item in itineraries[:3] %} <!-- Show only first 3 -->
+                <div class="flex gap-4">
+                    <div class="text-right w-20 flex-shrink-0">
+                        <div class="text-amber-400 text-sm">{{ item.day }}</div>
+                    </div>
+                    <div>
+                        <p class="font-medium">{{ item.title }}</p>
+                        <p class="text-xs text-amber-300">{{ item.description[:80] }}...</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-amber-200">No itinerary assigned yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Recent Bookings -->
+        <div class="bg-zinc-900 rounded-3xl p-8">
+            <h2 class="text-2xl mb-6 flex items-center gap-3">
+                <span>💳</span> Your Bookings
+            </h2>
+            {% if bookings %}
+            <div class="space-y-6">
+                {% for booking in bookings %}
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="font-medium">{{ booking.title }}</p>
+                        <p class="text-xs text-amber-300">${{ booking.amount }}</p>
+                    </div>
+                    <span class="px-4 py-1 text-xs rounded-3xl 
+                        {% if booking.status == 'confirmed' %}bg-emerald-400 text-black{% else %}bg-amber-400 text-black{% endif %}">
+                        {{ booking.status.upper() }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-amber-200">No bookings yet.</p>
+            {% endif %}
+            
+            <a href="{{ url_for('user.bookings') }}" 
+               class="block mt-8 text-center border border-amber-400 py-4 rounded-3xl hover:bg-amber-400 hover:text-black">
+                Manage All Bookings
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="mt-16 grid grid-cols-3 gap-6">
+        <a href="{{ url_for('user.itineraries') }}" 
+           class="bg-zinc-900 hover:bg-zinc-800 p-8 rounded-3xl text-center transition">
+            <div class="text-4xl mb-4">🗺️</div>
+            <p class="font-medium">View Itinerary</p>
+        </a>
+        <a href="{{ url_for('user.bookings') }}" 
+           class="bg-zinc-900 hover:bg-zinc-800 p-8 rounded-3xl text-center transition">
+            <div class="text-4xl mb-4">💰</div>
+            <p class="font-medium">Make Payment</p>
+        </a>
+        <a href="{{ url_for('user.reviews') }}" 
+           class="bg-zinc-900 hover:bg-zinc-800 p-8 rounded-3xl text-center transition">
+            <div class="text-4xl mb-4">⭐</div>
+            <p class="font-medium">Leave a Review</p>
+        </a>
+    </div>
+</div>
+{% endblock %}

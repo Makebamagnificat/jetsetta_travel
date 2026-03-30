@@ -1,0 +1,69 @@
+<!-- templates/admin/itineraries.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-6 py-12">
+    <div class="flex justify-between items-center mb-10">
+        <h1 class="text-5xl font-light tracking-tight">Manage Itineraries</h1>
+        <a href="{{ url_for('admin.dashboard') }}" 
+           class="text-amber-400 hover:underline">← Back to Dashboard</a>
+    </div>
+
+    <!-- Add New Activity Form -->
+    <div class="bg-zinc-900 rounded-3xl p-8 mb-12">
+        <h2 class="text-2xl mb-6">Add New Activity</h2>
+        <form method="POST" action="{{ url_for('admin.add_itinerary') }}" class="grid md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-xs text-amber-300 mb-2">Day</label>
+                <input type="text" name="day" placeholder="Day 3" 
+                       class="w-full bg-black border border-amber-400/30 rounded-3xl px-6 py-4" required>
+            </div>
+            <div>
+                <label class="block text-xs text-amber-300 mb-2">Date</label>
+                <input type="text" name="date_str" placeholder="17 Jun 2026" 
+                       class="w-full bg-black border border-amber-400/30 rounded-3xl px-6 py-4">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-xs text-amber-300 mb-2">Activity Title</label>
+                <input type="text" name="title" placeholder="Private Sunset Yacht Cruise" 
+                       class="w-full bg-black border border-amber-400/30 rounded-3xl px-6 py-4" required>
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-xs text-amber-300 mb-2">Description</label>
+                <textarea name="description" rows="4" 
+                          class="w-full bg-black border border-amber-400/30 rounded-3xl px-6 py-4"
+                          placeholder="Sail around the caldera with local wine tasting..."></textarea>
+            </div>
+            <div class="md:col-span-2">
+                <button type="submit" 
+                        class="gold-button w-full py-6 rounded-3xl text-lg">
+                    Add Activity to Itinerary
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Existing Itineraries -->
+    <h2 class="text-2xl mb-6">Current Itinerary Activities</h2>
+    <div class="space-y-6">
+        {% for item in itineraries %}
+        <div class="bg-zinc-900 rounded-3xl p-8 flex gap-8 items-center">
+            <div class="w-28 text-center">
+                <div class="text-amber-400">{{ item.day }}</div>
+                <div class="text-3xl font-light">{{ item.date_str or '' }}</div>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-xl font-medium">{{ item.title }}</h3>
+                <p class="text-amber-200 mt-2">{{ item.description }}</p>
+            </div>
+            <div class="text-right">
+                <span onclick="alert('Edit functionality coming soon')" 
+                      class="cursor-pointer text-amber-400 hover:text-white text-sm underline">
+                    Edit
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

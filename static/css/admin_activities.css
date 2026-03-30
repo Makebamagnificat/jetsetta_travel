@@ -1,0 +1,89 @@
+/* admin_activities.css */
+
+/* Body & page background */
+body {
+    background-color: #1a1a1a; /* deep black */
+    color: #f0d67f;            /* soft gold text */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Container for content */
+.container {
+    width: 90%;
+    margin: 40px auto;
+}
+
+/* Page heading */
+h1 {
+    text-align: center;
+    font-size: 2.5em;
+    margin-bottom: 30px;
+    color: #ffd700; /* bright gold */
+    text-shadow: 1px 1px 3px #000;
+}
+
+/* Table styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #222; /* dark table background */
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); /* gold glow */
+}
+
+/* Table headers */
+th {
+    background-color: #333;
+    color: #ffd700;
+    padding: 15px;
+    text-align: left;
+    font-size: 1.1em;
+}
+
+/* Table rows */
+td {
+    padding: 12px;
+    border-bottom: 1px solid #444;
+}
+
+/* Hover effect on rows */
+tr:hover {
+    background-color: #444;
+}
+
+/* Buttons */
+.btn {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ffd700;
+    color: #1a1a1a;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    background-color: #e6c200;
+}
+
+/* Status badges */
+.status {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.status.pending {
+    background-color: #f0d67f;
+    color: #1a1a1a;
+}
+
+.status.approved {
+    background-color: #ffd700;
+    color: #000;
+}

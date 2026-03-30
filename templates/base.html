@@ -1,0 +1,149 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jetsetta Travel & Tours</title>
+    
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Font Awesome for social icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600&display=swap');
+        
+        :root { --gold: #e2b13d; }
+        
+        body { font-family: 'Inter', system_ui, sans-serif; }
+
+        .logo-font { font-family: 'Playfair Display', serif; }
+
+        .gold-button {
+            background: linear-gradient(90deg, #e2b13d, #f5d16a);
+            color: #000;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .gold-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgb(226 177 61);
+        }
+        .nav-link:hover { color: #e2b13d; }
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgb(226 177 61 / 0.15);
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <!-- Navbar -->
+    <nav class="bg-black border-b border-amber-400/30 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center gap-x-3">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" 
+                     alt="Jetsetta Logo" class="h-12 w-auto">
+                <div>
+                    <h1 class="logo-font text-4xl tracking-tighter text-[#e2b13d]">Jetsetta</h1>
+                    <p class="text-xs tracking-[2px] text-amber-200 -mt-1">TRAVEL &amp; TOURS</p>
+                </div>
+            </div>
+
+            <!-- Menu -->
+            <div class="hidden md:flex items-center gap-x-8 text-sm font-medium">
+                <a href="{{ url_for('user.index') }}" class="nav-link">Home</a>
+                <a href="{{ url_for('user.itineraries') }}" class="nav-link">Itineraries</a>
+                <a href="{{ url_for('user.bookings') }}" class="nav-link">Bookings</a>
+                <a href="{{ url_for('user.reviews') }}" class="nav-link">Reviews</a>
+                <a href="{{ url_for('auth.signup') }}" class="nav-link gold-button px-4 py-2 rounded-3xl text-sm font-semibold">Resgister</a>
+            </div>
+
+            <!-- Right side -->
+            <div class="flex items-center gap-x-6">
+                <!-- Weather Widget -->
+                <div onclick="getWeather()" 
+                     class="hidden md:flex items-center gap-x-3 bg-zinc-900 hover:bg-zinc-800 px-5 py-2.5 rounded-3xl cursor-pointer border border-amber-400/20">
+                    <span id="weather-city" class="text-sm font-medium">Accra</span>
+                    <span id="weather-temp" class="text-2xl font-semibold text-[#e2b13d]">28°</span>
+                    <span id="weather-icon" class="text-3xl">⛅</span>
+                </div>
+
+                {% if current_user.is_authenticated %}
+                <div class="flex items-center gap-x-3 bg-zinc-900 px-5 py-2 rounded-3xl">
+                    <div class="w-9 h-9 bg-amber-400 text-black rounded-2xl flex items-center justify-center font-bold text-lg">
+                        {{ current_user.name[0].upper() }}
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold">{{ current_user.name }}</p>
+                        <p class="text-xs text-amber-300 -mt-0.5">{{ current_user.role }}</p>
+                    </div>
+                </div>
+
+                {% if current_user.role == 'admin' %}
+                <a href="{{ url_for('admin.dashboard') }}" 
+                   class="px-6 py-3 bg-amber-400 text-black rounded-3xl text-sm font-semibold hover:bg-amber-300">
+                    Admin Portal
+                </a>
+                {% endif %}
+
+                <a href="{{ url_for('auth.logout') }}" 
+                   class="text-sm hover:text-red-400 transition">Logout</a>
+                {% else %}
+                <a href="{{ url_for('auth.login') }}" 
+                   class="px-7 py-3 border border-amber-400 rounded-3xl hover:bg-amber-400 hover:text-black transition">
+                    Sign In
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="max-w-7xl mx-auto px-8 py-4 text-center 
+                {% if category == 'success' %}bg-emerald-500 text-black{% else %}bg-red-500{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    {% block content %}{% endblock %}
+
+    <!-- Footer with social links -->
+    <footer class="bg-black border-t border-amber-400/30 mt-12 py-8">
+        <div class="max-w-7xl mx-auto text-center">
+            <p class="text-amber-300 mb-4">Follow us on social media:</p>
+            <div class="flex justify-center space-x-6 mt-4">
+                <a href="https://www.instagram.com/jetsetta_travel/" target="_blank" class="hover:text-white transition">
+                    <i class="fab fa-instagram fa-2x"></i>
+                </a>
+                <a href="https://www.facebook.com/jetsetta_travel/" target="_blank" class="hover:text-white transition">
+                    <i class="fab fa-facebook fa-2x"></i>
+                </a>
+                <a href="https://twitter.com/jetsetta_travel" target="_blank" class="hover:text-white transition">
+                    <i class="fab fa-twitter fa-2x"></i>
+                </a>
+            </div>
+            <p class="text-amber-400 text-sm mt-6">© 2026 Jetsetta Travel & Tour</p>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Main JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

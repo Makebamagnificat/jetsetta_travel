@@ -1,0 +1,60 @@
+<!-- templates/index.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<header class="hero-bg h-screen flex items-center relative">
+    <div class="max-w-7xl mx-auto px-8">
+        <div class="max-w-2xl">
+            <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-6 py-3 rounded-3xl text-sm mb-6">
+                <span class="relative flex h-3 w-3">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-400"></span>
+                </span>
+                NOW BOOKING SUMMER 2026 LUXURY TRIPS
+            </div>
+            
+            <h1 class="text-7xl md:text-8xl leading-none font-light tracking-tighter logo-font">
+                Your world.<br>Our expertise.
+            </h1>
+            
+            <p class="text-2xl text-amber-100 mt-6 max-w-md">
+                Private jets, handcrafted itineraries, and unforgettable memories.
+            </p>
+            
+            <div class="flex flex-wrap gap-4 mt-10">
+                <a href="{{ url_for('user.itineraries') }}" 
+                   class="gold-button px-10 py-6 rounded-3xl text-xl flex items-center gap-3">
+                    Browse Itineraries
+                    <span class="text-3xl">✈️</span>
+                </a>
+                <a href="{{ url_for('user.itineraries') }}" 
+                   class="border-2 border-amber-400 hover:bg-amber-400 hover:text-black px-10 py-6 rounded-3xl text-xl">
+                    Explore Destinations
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Floating globe teaser -->
+    <div class="hidden lg:block absolute bottom-20 right-20">
+        <div class="w-80 h-80 bg-gradient-to-br from-amber-400 to-amber-600 rounded-[4rem] flex items-center justify-center rotate-12 shadow-2xl">
+            <div class="text-center text-black">
+                <div class="text-8xl mb-4">🌍</div>
+                <p class="text-4xl font-bold tracking-widest">JETSETTA</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Trust Bar -->
+<div class="bg-zinc-950 py-6 border-b border-amber-400/10">
+    <div class="max-w-7xl mx-auto px-8 flex flex-wrap justify-center gap-x-12 gap-y-4 text-sm text-amber-200">
+        <div>🛫 Airport VIP Pickup Included</div>
+        <div>🏡 Curated Villas &amp; Airbnbs</div>
+        <div>📍 Live GPS Tracking</div>
+        <div>🌤 Real-time Weather</div>
+        <div>⭐ 24/7 Concierge</div>
+    </div>
+</div>
+{% endblock %}

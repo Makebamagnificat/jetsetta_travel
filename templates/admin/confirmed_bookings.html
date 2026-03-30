@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmed Bookings</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #0a0a0a;
+            color: #fff;
+        }
+
+        .container {
+            padding: 40px;
+        }
+
+        h2 {
+            color: gold;
+            text-align: center;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #111;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.25);
+        }
+
+        th {
+            background: gold;
+            color: black;
+            padding: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #222;
+        }
+
+        tr:hover {
+            background-color: rgba(255, 215, 0, 0.1);
+            transition: 0.3s;
+        }
+
+        .status {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .confirmed {
+            background: rgba(0, 255, 150, 0.15);
+            color: #00ff99;
+            border: 1px solid #00ff99;
+        }
+
+        .amount {
+            color: gold;
+            font-weight: bold;
+        }
+
+        .card {
+            background: linear-gradient(145deg, #0f0f0f, #1a1a1a);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid gold;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+        }
+
+        .summary {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ccc;
+        }
+
+        .summary span {
+            color: #00ff99;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="card">
+
+        <h2>Confirmed Bookings</h2>
+
+        <p class="summary">
+            Total Confirmed: <span>{{ bookings|length }}</span>
+        </p>
+
+        <table>
+            <tr>
+                <th>User</th>
+                <th>Title</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+
+            {% for booking in bookings %}
+            <tr>
+                <td>{{ booking.user.name }}</td>
+                <td>{{ booking.title }}</td>
+                <td class="amount">GHS {{ booking.amount }}</td>
+                <td>
+                    <span class="status confirmed">
+                        {{ booking.status }}
+                    </span>
+                </td>
+                <td>{{ booking.created_at.strftime('%d %b %Y') }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+    </div>
+</div>
+
+</body>
+</html>

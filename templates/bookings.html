@@ -1,0 +1,49 @@
+<!-- templates/bookings.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-6 py-12">
+    <div class="flex justify-between items-center mb-10">
+        <h1 class="text-5xl font-light tracking-tight">Your Bookings &amp; Payments</h1>
+    </div>
+
+    {% if bookings %}
+    <div class="grid md:grid-cols-2 gap-8">
+        {% for booking in bookings %}
+        <div class="bg-zinc-900 rounded-3xl p-8 card-hover">
+            <div class="flex justify-between">
+                <div>
+                    <span class="px-5 py-1 text-xs rounded-3xl 
+                        {% if booking.status == 'confirmed' %}bg-emerald-400 text-black{% else %}bg-amber-400 text-black{% endif %}">
+                        {{ booking.status.upper() }}
+                    </span>
+                    <h3 class="text-2xl mt-6">{{ booking.title }}</h3>
+                    <p class="text-amber-200 mt-1">Luxury Travel Experience</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-4xl font-light text-[#e2b13d]">${{ booking.amount }}</div>
+                </div>
+            </div>
+
+            <div class="mt-10 pt-8 border-t border-amber-400/20">
+                {% if booking.status == 'pending' %}
+                <button onclick="payNow({{ booking.id }})" 
+                        class="w-full gold-button py-6 rounded-3xl text-lg font-semibold">
+                    Pay Now Securely • ${{ booking.amount }}
+                </button>
+                {% else %}
+                <div class="text-center py-6 bg-emerald-900/30 rounded-3xl text-emerald-400">
+                    ✓ Booking Confirmed
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-20 bg-zinc-900 rounded-3xl">
+        <p class="text-xl text-amber-200">You have no bookings yet.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

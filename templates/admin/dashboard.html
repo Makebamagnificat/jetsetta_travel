@@ -1,76 +1,60 @@
-<!-- templates/admin/dashboard.html -->
 {% extends "base.html" %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-6 py-12">
-    <h1 class="text-5xl font-light">Admin Dashboard</h1>
-    <p class="text-amber-300 mb-12">System Overview • {{ current_user.name }}</p>
+    <h2 class="text-3xl font-semibold text-amber-300 mb-8">Admin Dashboard</h2>
 
-    <a href="{{ url_for('admin.view_users') }}" class="card-link">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-        <div class="bg-zinc-900 rounded-3xl p-8">
-            <p class="text-amber-400 text-sm">TOTAL USERS</p>
-            <p class="text-6xl font-light mt-4">{{ total_users }}</p>
-        </div>
-    </a>
-        
-    <a href="{{ url_for('admin.pending_bookings') }}" class="card-link">
-         <div class="bg-zinc-900 rounded-3xl p-8">
-            <p class="text-amber-400 text-sm">PENDING BOOKINGS</p>
-            <p class="text-6xl font-light mt-4 text-orange-400">{{ pending_bookings }}</p>
-        </div>
-    </a>        
-       
-    <a href="{{ url_for('admin.confirmed_bookings') }}" class="card-link">
-        <div class="bg-zinc-900 rounded-3xl p-8">
-            <p class="text-amber-400 text-sm">CONFIRMED</p>
-            <p class="text-6xl font-light mt-4 text-emerald-400">{{ confirmed_bookings }}</p>
-        </div>
-    </a>
-    
-    <a href="{{ url_for('admin.activities') }}" class="card-link">
-        <div class="bg-zinc-900 rounded-3xl p-8">
-            <p class="text-amber-400 text-sm">ACTIVITIES</p>
-            <p class="text-6xl font-light mt-4">{{ total_itineraries }}</p>
-        </div>
-    </a>    
-    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
-    <!-- Recent RSVPs -->
-    <div class="bg-zinc-900 rounded-3xl p-8">
-        <h2 class="text-2xl mb-6">Recent Activity RSVPs</h2>
-        <table class="w-full text-sm">
-            <thead>
-                <tr class="border-b border-amber-400/30">
-                    <th class="text-left py-4">User</th>
-                    <th class="text-left py-4">Activity</th>
-                    <th class="text-center py-4">Status</th>
-                    <th class="text-right py-4">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for rsvp in recent_rsvps %}
-                <tr class="border-b border-amber-400/10">
-                    <td class="py-5">{{ rsvp.user.name }}</td>
-                    <td class="py-5">{{ rsvp.itinerary.title }}</td>
-                    <td class="py-5 text-center">
-                        <span class="px-4 py-1 rounded-3xl text-xs 
-                            {% if rsvp.status == 'approved' %}bg-emerald-400 text-black{% else %}bg-amber-400 text-black{% endif %}">
-                            {{ rsvp.status.upper() }}
-                        </span>
-                    </td>
-                    <td class="py-5 text-right">
-                        {% if rsvp.status != 'approved' %}
-                        <a href="{{ url_for('admin.approve_rsvp', rsvp_id=rsvp.id) }}" 
-                           class="px-6 py-2 bg-emerald-400 text-black rounded-3xl text-xs">Approve</a>
-                        {% else %}
-                        <span class="text-emerald-400">Approved</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <!-- Users Card -->
+        <div class="bg-zinc-900 p-6 rounded-xl shadow-md hover:shadow-2xl transition transform hover:-translate-y-2">
+            <h3 class="text-xl font-semibold text-amber-300 mb-3">Users</h3>
+            <p class="text-gray-300 mb-4">Manage all registered users.</p>
+            <a href="{{ url_for('admin.users') }}" class="gold-button px-4 py-2 rounded-lg text-sm font-semibold">View Users</a>
+        </div>
+
+        <!-- All Bookings Card -->
+        <div class="bg-zinc-900 p-6 rounded-xl shadow-md hover:shadow-2xl transition transform hover:-translate-y-2">
+            <h3 class="text-xl font-semibold text-amber-300 mb-3">All Bookings</h3>
+            <p class="text-gray-300 mb-4">View every booking made by users.</p>
+            <a href="{{ url_for('admin.bookings') }}" class="gold-button px-4 py-2 rounded-lg text-sm font-semibold">View Bookings</a>
+        </div>
+
+        <!-- Pending Bookings Card -->
+        <div class="bg-zinc-900 p-6 rounded-xl shadow-md hover:shadow-2xl transition transform hover:-translate-y-2">
+            <h3 class="text-xl font-semibold text-amber-300 mb-3">Pending Bookings</h3>
+            <p class="text-gray-300 mb-4">Confirm pending bookings.</p>
+            <a href="{{ url_for('admin.pending_bookings') }}" class="gold-button px-4 py-2 rounded-lg text-sm font-semibold">View Pending</a>
+        </div>
+
+        <!-- Confirmed Bookings Card -->
+        <div class="bg-zinc-900 p-6 rounded-xl shadow-md hover:shadow-2xl transition transform hover:-translate-y-2">
+            <h3 class="text-xl font-semibold text-amber-300 mb-3">Confirmed Bookings</h3>
+            <p class="text-gray-300 mb-4">See all confirmed bookings.</p>
+            <a href="{{ url_for('admin.confirmed_bookings') }}" class="gold-button px-4 py-2 rounded-lg text-sm font-semibold">View Confirmed</a>
+        </div>
+
+        <!-- Pending RSVPs Card -->
+        <div class="bg-zinc-900 p-6 rounded-xl shadow-md hover:shadow-2xl transition transform hover:-translate-y-2">
+            <h3 class="text-xl font-semibold text-amber-300 mb-3">Pending RSVPs</h3>
+            <p class="text-gray-300 mb-4">Approve or manage RSVPs.</p>
+            <a href="{{ url_for('admin.pending_rsvps') }}" class="gold-button px-4 py-2 rounded-lg text-sm font-semibold">View RSVPs</a>
+        </div>
+
+        <!-- Activities Card -->
+        <div class="bg-zinc-900 p-6 rounded-xl shadow-md hover:shadow-2xl transition transform hover:-translate-y-2">
+            <h3 class="text-xl font-semibold text-amber-300 mb-3">Activities</h3>
+            <p class="text-gray-300 mb-4">View all activity RSVPs.</p>
+            <a href="{{ url_for('admin.activities') }}" class="gold-button px-4 py-2 rounded-lg text-sm font-semibold">View Activities</a>
+        </div>
+
+        <!-- Itineraries Card -->
+        <div class="bg-zinc-900 p-6 rounded-xl shadow-md hover:shadow-2xl transition transform hover:-translate-y-2">
+            <h3 class="text-xl font-semibold text-amber-300 mb-3">Itineraries</h3>
+            <p class="text-gray-300 mb-4">Manage daily itineraries and activities.</p>
+            <a href="{{ url_for('admin.itineraries') }}" class="gold-button px-4 py-2 rounded-lg text-sm font-semibold">View Itineraries</a>
+        </div>
+
     </div>
 </div>
 {% endblock %}

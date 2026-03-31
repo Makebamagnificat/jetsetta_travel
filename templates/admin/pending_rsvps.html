@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-7xl mx-auto mt-8 px-8">
+    <h2 class="text-2xl font-bold text-amber-400 mb-6">Pending Activity RSVPs</h2>
+    {% if rsvps %}
+    <table class="w-full text-left text-white">
+        <thead class="bg-zinc-800">
+            <tr>
+                <th class="p-3">User</th>
+                <th class="p-3">Activity</th>
+                <th class="p-3">Date</th>
+                <th class="p-3">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rsvp in rsvps %}
+            <tr class="border-b border-zinc-700">
+                <td class="p-3">{{ rsvp.user.name }}</td>
+                <td class="p-3">{{ rsvp.itinerary.title }}</td>
+                <td class="p-3">{{ rsvp.itinerary.date_str }}</td>
+                <td class="p-3">
+                    <a href="{{ url_for('admin.approve_rsvp', rsvp_id=rsvp.id) }}"
+                       class="px-4 py-2 bg-amber-400 text-black rounded-2xl hover:bg-amber-300">
+                       Approve
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p class="text-white">No pending RSVPs.</p>
+    {% endif %}
+</div>
+{% endblock %}

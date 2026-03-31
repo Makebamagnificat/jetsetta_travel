@@ -1,8 +1,8 @@
-<!-- templates/dashboard.html -->
 {% extends "base.html" %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-6 py-12">
+    <!-- Welcome Header -->
     <div class="flex justify-between items-end mb-12">
         <div>
             <h1 class="text-5xl font-light tracking-tight">Welcome back, {{ current_user.name }}!</h1>
@@ -12,7 +12,30 @@
            class="gold-button px-8 py-4 rounded-3xl">View Full Itinerary</a>
     </div>
 
-    <div class="grid md:grid-cols-2 gap-8">
+    <!-- Floating, Collapsible Chat Bubble -->
+    <div id="chatbot-container" class="fixed bottom-6 right-6 z-50">
+        <button id="chat-toggle" class="bg-amber-400 hover:bg-amber-500 text-black rounded-full w-14 h-14 shadow-lg flex items-center justify-center">
+            💬
+        </button>
+
+        <div id="chat-window" class="hidden w-80 h-96 bg-zinc-900 text-white rounded-xl shadow-xl flex flex-col overflow-hidden mt-2">
+            <div class="bg-amber-400 text-black px-4 py-2 font-semibold flex justify-between items-center">
+                Jetsetta Chat
+                <button id="chat-close" class="text-black font-bold">&times;</button>
+            </div>
+
+            <div id="chat-output" class="flex-1 p-4 overflow-y-auto space-y-1 text-sm">
+                <p class="text-amber-300">Hi! I'm your AI travel assistant ✈️</p>
+            </div>
+
+            <div class="p-3 bg-zinc-800 flex gap-2">
+                <input id="msg" type="text" placeholder="Ask me anything..." class="flex-1 px-3 py-2 rounded text-black" />
+                <button onclick="sendMsg()" class="bg-amber-400 hover:bg-amber-500 text-black px-4 py-2 rounded">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8 mt-12">
         <!-- Upcoming Itinerary -->
         <div class="bg-zinc-900 rounded-3xl p-8">
             <h2 class="text-2xl mb-6 flex items-center gap-3">
@@ -20,7 +43,7 @@
             </h2>
             {% if itineraries %}
             <div class="space-y-6">
-                {% for item in itineraries[:3] %} <!-- Show only first 3 -->
+                {% for item in itineraries[:3] %}
                 <div class="flex gap-4">
                     <div class="text-right w-20 flex-shrink-0">
                         <div class="text-amber-400 text-sm">{{ item.day }}</div>
@@ -37,30 +60,46 @@
             {% endif %}
         </div>
 
-        <!-- Recent Bookings -->
+        <!-- User Bookings -->
         <div class="bg-zinc-900 rounded-3xl p-8">
             <h2 class="text-2xl mb-6 flex items-center gap-3">
                 <span>💳</span> Your Bookings
             </h2>
+
             {% if bookings %}
             <div class="space-y-6">
                 {% for booking in bookings %}
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="font-medium">{{ booking.title }}</p>
-                        <p class="text-xs text-amber-300">${{ booking.amount }}</p>
+                <div class="bg-zinc-800 p-4 rounded-xl shadow flex flex-col items-start gap-3">
+                    <div class="flex justify-between w-full items-center">
+                        <div>
+                            <p class="font-medium text-amber-300">{{ booking.title }}</p>
+                            <p class="text-sm text-gray-300">${{ booking.amount }}</p>
+                        </div>
+                        <span class="px-4 py-1 text-xs rounded-3xl 
+                            {% if booking.status == 'confirmed' %}bg-emerald-400 text-black{% else %}bg-amber-400 text-black{% endif %}">
+                            {{ booking.status.upper() }}
+                        </span>
                     </div>
-                    <span class="px-4 py-1 text-xs rounded-3xl 
-                        {% if booking.status == 'confirmed' %}bg-emerald-400 text-black{% else %}bg-amber-400 text-black{% endif %}">
-                        {{ booking.status.upper() }}
-                    </span>
+
+                    <!-- Conditional Actions -->
+                    <div class="flex flex-col gap-2">
+                        {% if booking.status == 'pending' %}
+                            <button class="gold-button px-4 py-2 rounded-lg" onclick="payNow({{ booking.id }})">Pay Now</button>
+                        {% elif booking.status == 'confirmed' %}
+                            <p class="text-green-400 font-semibold">Your Booking is Confirmed!</p>
+                            <img src="{{ url_for('static', filename='qrs/booking_' ~ booking.id ~ '.png') }}" alt="QR Ticket" class="w-32 h-32">
+                        {% endif %}
+
+                        <a href="https://wa.me/1234567890?text=I want to book {{ booking.title }}" target="_blank" 
+                           class="gold-button text-center">Book via WhatsApp</a>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
             {% else %}
             <p class="text-amber-200">No bookings yet.</p>
             {% endif %}
-            
+
             <a href="{{ url_for('user.bookings') }}" 
                class="block mt-8 text-center border border-amber-400 py-4 rounded-3xl hover:bg-amber-400 hover:text-black">
                 Manage All Bookings
@@ -87,4 +126,67 @@
         </a>
     </div>
 </div>
+
+<!-- Scripts -->
+<script>
+const chatToggle = document.getElementById("chat-toggle");
+const chatWindow = document.getElementById("chat-window");
+const chatClose = document.getElementById("chat-close");
+
+chatToggle.addEventListener("click", () => chatWindow.classList.toggle("hidden"));
+chatClose.addEventListener("click", () => chatWindow.classList.add("hidden"));
+
+async function sendMsg() {
+    const msgInput = document.getElementById("msg");
+    const output = document.getElementById("chat-output");
+    const msg = msgInput.value.trim();
+    if (!msg) return;
+
+    const userMsg = document.createElement("p");
+    userMsg.className = "text-amber-300 mb-1";
+    userMsg.innerHTML = `<strong>You:</strong> ${msg}`;
+    output.appendChild(userMsg);
+    msgInput.value = '';
+    output.scrollTop = output.scrollHeight;
+
+    try {
+        const res = await fetch('/chatbot', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({message: msg})
+        });
+        const data = await res.json();
+        const botMsg = document.createElement("p");
+        botMsg.className = "text-white mb-1";
+        botMsg.innerHTML = `<strong>Bot:</strong> ${data.reply}`;
+        output.appendChild(botMsg);
+        output.scrollTop = output.scrollHeight;
+    } catch (error) {
+        const errorMsg = document.createElement("p");
+        errorMsg.className = "text-red-500";
+        errorMsg.textContent = "Bot is not responding. Try again later.";
+        output.appendChild(errorMsg);
+    }
+}
+
+// Stripe Payment
+function payNow(bookingId) {
+    fetch("/create-checkout-session", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({booking_id: bookingId})
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.id){
+            const stripe = Stripe("{{ stripe_public_key }}");
+            stripe.redirectToCheckout({ sessionId: data.id });
+        } else {
+            alert(data.error || "Payment failed");
+        }
+    })
+    .catch(err => console.error(err));
+}
+</script>
+
 {% endblock %}

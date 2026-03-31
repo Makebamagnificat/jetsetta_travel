@@ -9,23 +9,28 @@
     <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Font Awesome (Only one version - latest) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
-    <!-- Font Awesome for social icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    
+
+    <!-- Inline Styles -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600&display=swap');
         
         :root { --gold: #e2b13d; }
         
-        body { font-family: 'Inter', system_ui, sans-serif; }
-
-        .logo-font { font-family: 'Playfair Display', serif; }
+        body { 
+            font-family: 'Inter', system-ui, sans-serif; 
+        }
+        
+        .logo-font { 
+            font-family: 'Playfair Display', serif; 
+        }
 
         .gold-button {
             background: linear-gradient(90deg, #e2b13d, #f5d16a);
@@ -33,18 +38,25 @@
             font-weight: 600;
             transition: all 0.3s ease;
         }
+        
         .gold-button:hover {
             transform: scale(1.05);
             box-shadow: 0 10px 15px -3px rgb(226 177 61);
         }
-        .nav-link:hover { color: #e2b13d; }
+        
+        .nav-link:hover { 
+            color: #e2b13d; 
+        }
+        
         .card-hover:hover {
             transform: translateY(-8px);
             box-shadow: 0 25px 50px -12px rgb(226 177 61 / 0.15);
         }
     </style>
 </head>
+
 <body class="bg-black text-white">
+
     <!-- Navbar -->
     <nav class="bg-black border-b border-amber-400/30 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
@@ -64,7 +76,6 @@
                 <a href="{{ url_for('user.itineraries') }}" class="nav-link">Itineraries</a>
                 <a href="{{ url_for('user.bookings') }}" class="nav-link">Bookings</a>
                 <a href="{{ url_for('user.reviews') }}" class="nav-link">Reviews</a>
-                <a href="{{ url_for('auth.signup') }}" class="nav-link gold-button px-4 py-2 rounded-3xl text-sm font-semibold">Resgister</a>
             </div>
 
             <!-- Right side -->
@@ -108,42 +119,58 @@
     </nav>
 
     <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-            <div class="max-w-7xl mx-auto px-8 py-4 text-center 
-                {% if category == 'success' %}bg-emerald-500 text-black{% else %}bg-red-500{% endif %}">
-                {{ message }}
-            </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+    <div id="flash-container" class="fixed top-6 right-6 z-50 space-y-3"></div>
 
     <!-- Main Content -->
     {% block content %}{% endblock %}
 
-    <!-- Footer with social links -->
-    <footer class="bg-black border-t border-amber-400/30 mt-12 py-8">
-        <div class="max-w-7xl mx-auto text-center">
-            <p class="text-amber-300 mb-4">Follow us on social media:</p>
-            <div class="flex justify-center space-x-6 mt-4">
-                <a href="https://www.instagram.com/jetsetta_travel/" target="_blank" class="hover:text-white transition">
-                    <i class="fab fa-instagram fa-2x"></i>
+    <!-- Footer -->
+    <footer class="bg-black border-t border-amber-400/30 mt-20">
+        <div class="max-w-7xl mx-auto px-6 py-12 text-center">
+            <p class="text-amber-300 mb-6 text-sm">Follow us on social media:</p>
+            
+            <div class="flex justify-center gap-10 text-4xl mb-10">
+                <!-- Instagram -->
+                <a href="https://www.instagram.com/jetsettatravel?igsh=MXd5eGZzZm5vbDY4bA==" 
+                   target="_blank" 
+                   class="hover:scale-110 transition-transform text-[#e2b13d]">
+                    <i class="fab fa-instagram"></i>
                 </a>
-                <a href="https://www.facebook.com/jetsetta_travel/" target="_blank" class="hover:text-white transition">
-                    <i class="fab fa-facebook fa-2x"></i>
+                
+                <!-- Facebook -->
+                <a href="#" target="_blank" class="hover:scale-110 transition-transform text-[#e2b13d]">
+                    <i class="fab fa-facebook"></i>
                 </a>
-                <a href="https://twitter.com/jetsetta_travel" target="_blank" class="hover:text-white transition">
-                    <i class="fab fa-twitter fa-2x"></i>
+                
+                <!-- Twitter / X -->
+                <a href="#" target="_blank" class="hover:scale-110 transition-transform text-[#e2b13d]">
+                    <i class="fab fa-twitter"></i>
                 </a>
             </div>
-            <p class="text-amber-400 text-sm mt-6">© 2026 Jetsetta Travel & Tour</p>
+
+            <p class="text-amber-300 text-xs">
+                © 2026 Jetsetta Travel & Tours. All Rights Reserved.
+            </p>
         </div>
     </footer>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <!-- Main JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    <!-- Flash Messages Auto-dismiss -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const messages = document.querySelectorAll(".flash-message");
+            messages.forEach((msg, index) => {
+                setTimeout(() => {
+                    msg.style.opacity = "0";
+                    setTimeout(() => msg.remove(), 600);
+                }, 4000 + (index * 600));
+            });
+        });
+    </script>
 </body>
 </html>

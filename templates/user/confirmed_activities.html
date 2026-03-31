@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-7xl mx-auto mt-8 px-8">
+    <h2 class="text-2xl font-bold text-amber-400 mb-6">Your Confirmed Activities</h2>
+    {% if rsvps %}
+    <ul class="space-y-4">
+        {% for rsvp in rsvps %}
+        <li class="bg-zinc-900 p-4 rounded-xl flex justify-between items-center">
+            <div>
+                <p class="font-semibold">{{ rsvp.itinerary.title }}</p>
+                <p class="text-sm text-amber-300">{{ rsvp.itinerary.date_str }}</p>
+            </div>
+            <a href="{{ url_for('user.cancel_rsvp', rsvp_id=rsvp.id) }}"
+               onclick="return confirm('Are you sure you want to cancel this activity?');"
+               class="px-4 py-2 bg-red-600 rounded-xl hover:bg-red-500 text-white">
+               Cancel
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <p class="text-white">No confirmed activities yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

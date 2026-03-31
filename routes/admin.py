@@ -1,80 +1,92 @@
 # routes/admin.py
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
-from models import (
-    db, User, Booking, Itinerary, Review)
-from models import ActivityRSVP
+from models import db, User, Booking, Itinerary, ActivityRSVP
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
+# Decorator to enforce admin access
 def admin_required(f):
     @login_required
     def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or current_user.role != 'admin':
+        if current_user.role != 'admin':
             flash('Admin access required.', 'danger')
             return redirect(url_for('user.index'))
         return f(*args, **kwargs)
     decorated_function.__name__ = f.__name__
     return decorated_function
 
+
+# -------------------- DASHBOARD --------------------
 @admin_bp.route('/dashboard')
 @admin_required
 def dashboard():
     total_users = User.query.count()
-    pending_bookings = Booking.query.filter_by(status='pending').count()
     total_bookings = Booking.query.count()
-    return render_template('admin/dashboard.html', 
-                         total_users=total_users,
-                         pending_bookings=pending_bookings,
-                         total_bookings=total_bookings)
+    pending_bookings = Booking.query.filter_by(status='pending').count()
+    return render_template('admin/dashboard.html',
+                           total_users=total_users,
+                           total_bookings=total_bookings,
+                           pending_bookings=pending_bookings)
 
+
+# -------------------- USERS --------------------
 @admin_bp.route('/users')
 @admin_required
 def users():
+    """List all users"""
     all_users = User.query.all()
     return render_template('admin/users.html', users=all_users)
 
-# VIEW USERS
-@admin_bp.route('/admin/users')
-def view_users():
-    users = User.query.all()
-    return render_template('admin/users.html', users=users)
 
-# Delete user
-@admin_bp.route('/users/delete/<int:user_id>')
-def delete_user(user_id):
-    user = User.query.get_or_404(user_id)
-    db.session.delete(user)
-    db.session.commit()
-    flash(f'User {user.username} has been deleted.', 'success')
-    return redirect(url_for('admin.users'))
-
-# Edit user
 @admin_bp.route('/users/edit/<int:user_id>', methods=['GET', 'POST'])
+@admin_required
 def edit_user(user_id):
     user = User.query.get_or_404(user_id)
     if request.method == 'POST':
-        user.username = request.form['username']
+        user.name = request.form['name']
         user.email = request.form['email']
-        # Add any other fields you want to edit
         db.session.commit()
-        flash(f'User {user.username} has been updated.', 'success')
+        flash(f'User {user.name} has been updated.', 'success')
         return redirect(url_for('admin.users'))
     return render_template('admin/edit_user.html', user=user)
 
+
+@admin_bp.route('/users/delete/<int:user_id>')
+@admin_required
+def delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    user_name = user.name
+    db.session.delete(user)
+    db.session.commit()
+    flash(f'User {user_name} has been deleted.', 'success')
+    return redirect(url_for('admin.users'))
+
+
+# -------------------- BOOKINGS --------------------
 @admin_bp.route('/bookings')
 @admin_required
 def bookings():
+    """All bookings"""
     all_bookings = Booking.query.all()
     return render_template('admin/bookings.html', bookings=all_bookings)
 
-# PENDING BOOKINGS
-@admin_bp.route('/admin/bookings/pending')
+
+@admin_bp.route('/bookings/pending')
+@admin_required
 def pending_bookings():
     bookings = Booking.query.filter_by(status='pending').all()
     return render_template('admin/pending_bookings.html', bookings=bookings)
 
-@admin_bp.route('/confirm-booking/<int:booking_id>', methods=['POST'])
+
+@admin_bp.route('/bookings/confirmed')
+@admin_required
+def confirmed_bookings():
+    bookings = Booking.query.filter_by(status='confirmed').all()
+    return render_template('admin/confirmed_bookings.html', bookings=bookings)
+
+
+@admin_bp.route('/bookings/confirm/<int:booking_id>', methods=['POST'])
 @admin_required
 def confirm_booking(booking_id):
     booking = Booking.query.get_or_404(booking_id)
@@ -84,12 +96,33 @@ def confirm_booking(booking_id):
     return redirect(url_for('admin.bookings'))
 
 
-# CONFIRMED BOOKINGS
-@admin_bp.route('/admin/bookings/confirmed')
-def confirmed_bookings():
-    bookings = Booking.query.filter_by(status='confirmed').all()
-    return render_template('admin/confirmed_bookings.html', bookings=bookings)
+# -------------------- RSVPS / ACTIVITIES --------------------
+@admin_bp.route('/rsvps/pending')
+@admin_required
+def pending_rsvps():
+    rsvps = ActivityRSVP.query.filter_by(status='pending').order_by(ActivityRSVP.created_at.desc()).all()
+    return render_template('admin/pending_rsvps.html', rsvps=rsvps)
 
+
+@admin_bp.route('/rsvps/approve/<int:rsvp_id>')
+@admin_required
+def approve_rsvp(rsvp_id):
+    rsvp = ActivityRSVP.query.get_or_404(rsvp_id)
+    rsvp.status = 'approved'
+    db.session.commit()
+    flash(f"{rsvp.user.name}'s RSVP for '{rsvp.itinerary.title}' has been approved.", "success")
+    return redirect(url_for('admin.pending_rsvps'))
+
+
+@admin_bp.route('/activities')
+@admin_required
+def activities():
+    """View all activity RSVPs"""
+    activities = ActivityRSVP.query.all()
+    return render_template('admin/activities.html', activities=activities)
+
+
+# -------------------- ITINERARIES --------------------
 @admin_bp.route('/itineraries')
 @admin_required
 def itineraries():
@@ -97,28 +130,22 @@ def itineraries():
     return render_template('admin/itineraries.html', itineraries=all_itineraries)
 
 
-# ACTIVITIES
-@admin_bp.route('/admin/activities')
-def activities():
-    activities = ActivityRSVP.query.all()
-    return render_template('admin/activities.html', activities=activities)
-
-@admin_bp.route('/add-itinerary', methods=['POST'])
+@admin_bp.route('/itineraries/add', methods=['POST'])
 @admin_required
 def add_itinerary():
     day = request.form.get('day')
     title = request.form.get('title')
     description = request.form.get('description')
-    date = request.form.get('date')
-
+    date_str = request.form.get('date')
+    
     new_itinerary = Itinerary(
         day=day,
         title=title,
         description=description,
-        date=date
+        date_str=date_str
     )
     db.session.add(new_itinerary)
     db.session.commit()
     
-    flash('New activity added to itinerary!', 'success')
+    flash('New itinerary/activity added!', 'success')
     return redirect(url_for('admin.itineraries'))

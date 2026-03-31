@@ -3,41 +3,45 @@ from config import Config
 from models import db, User
 from flask_login import LoginManager
 from flask_mail import Mail
-import sys
 import os
 
-sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-
-# 1️⃣ Initialize extensions WITHOUT app
+# 1️⃣ Initialize extensions (NO app yet)
+db = db
 mail = Mail()
 login_manager = LoginManager()
+
 login_manager.login_view = 'auth.login'
 
-
-# ✅ DEFINE user_loader AFTER creating login_manager
+# 2️⃣ Define user loader AFTER login_manager is created
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
 
 def create_app():
-    # 2️⃣ Create Flask app
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # 3️⃣ Configure Mail
+    # 3️⃣ Mail config
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'
     app.config['MAIL_PORT'] = 587
     app.config['MAIL_USE_TLS'] = True
     app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
     app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 
-    # 4️⃣ Initialize extensions with app
+    # 4️⃣ Database config (IMPORTANT FIX)
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+        'DATABASE_URL',
+        'sqlite:///site.db'  # fallback for local dev
+    )
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    # 5️⃣ Initialize extensions
     db.init_app(app)
     mail.init_app(app)
     login_manager.init_app(app)
 
-    # 5️⃣ Register Blueprints
+    # 6️⃣ Register blueprints
     from routes.auth import auth_bp
     from routes.user import user_bp
     from routes.admin import admin_bp
@@ -46,17 +50,15 @@ def create_app():
     app.register_blueprint(user_bp)
     app.register_blueprint(admin_bp, url_prefix='/admin')
 
-    # 6️⃣ Create database tables
+    # 7️⃣ Create DB tables
     with app.app_context():
         db.create_all()
-        print("✅ Database tables are created successfully")
+        print("✅ Database tables created")
 
     return app
 
 
-# 7️⃣ Run the app
+# 8️⃣ Run app locally
 if __name__ == '__main__':
     app = create_app()
-    print("🚀 Jetsetta Travel & Tours server starting...")
-    print("🌐 Visit: http://127.0.0.1:5001")
     app.run(debug=True, port=5001)

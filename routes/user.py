@@ -9,6 +9,15 @@ from utils.qr import generate_qr
 
 user_bp = Blueprint('user', __name__)
 
+@user_bp.route('/api/weather')
+def weather():
+    city = request.args.get('city', 'Accra')
+    return jsonify({
+        "city": city,
+        "status": "Sunny ☀️",
+        "temp": "30°C"
+    })
+
 # Initialize Stripe
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 

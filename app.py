@@ -5,6 +5,12 @@ from flask_login import LoginManager
 from flask_mail import Mail
 import sys
 import os
+from models import User
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 

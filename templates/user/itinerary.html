@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-6 py-12 text-amber-300">
+
+    <h1 class="text-4xl font-light mb-6">My Itinerary</h1>
+
+    <!-- Map container -->
+    <div id="itinerary-map" class="w-full h-[500px] rounded-3xl mb-10 shadow-lg border border-amber-400/30"></div>
+
+    <!-- Itinerary list -->
+    <div class="space-y-6">
+        {% for item in itineraries %}
+        <div class="bg-zinc-900 p-6 rounded-3xl flex justify-between items-center border border-amber-400/10">
+            <div>
+                <div class="text-amber-400 font-semibold">{{ item.day }} | {{ item.date_str }}</div>
+                <h3 class="text-xl font-medium">{{ item.title }}</h3>
+                <p class="text-amber-200 mt-1">{{ item.description }}</p>
+            </div>
+            <div>
+                <!-- Button to view on live map -->
+                <button onclick="openLiveMap({{ item.location_lat }}, {{ item.location_lng }}, '{{ item.title }}')"
+                        class="bg-amber-400 text-black px-4 py-2 rounded-2xl hover:bg-amber-300 transition">
+                    View Live on Map
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Empty State -->
+    {% if itineraries|length == 0 %}
+    <div class="text-center text-gray-500 mt-10">
+        No itinerary activities yet.
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- Leaflet CSS & JS (only once) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+    // Initialize the map once
+    const map = L.map("itinerary-map").setView([5.6037, -0.1870], 6); // Center on Ghana
+
+    // Add OpenStreetMap tiles
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        { attribution: "&copy; OpenStreetMap contributors" }
+    ).addTo(map);
+
+    // Array to store markers
+    const itineraryMarkers = [];
+
+    // Create markers for each itinerary
+    {% for item in itineraries %}
+        const marker{{ loop.index }} = L.marker([{{ item.location_lat }}, {{ item.location_lng }}])
+            .bindPopup(`<b>{{ item.title }}</b><br>{{ item.day }} | {{ item.date_str }}`)
+            .addTo(map);
+
+        itineraryMarkers.push({
+            marker: marker{{ loop.index }},
+            lat: {{ item.location_lat }},
+            lng: {{ item.location_lng }}
+        });
+    {% endfor %}
+
+    // Unified function to focus map on a specific itinerary
+    function openLiveMap(lat, lng, title) {
+        // Recenter map on the selected itinerary
+        map.setView([lat, lng], 14, { animate: true });
+
+        // Open popup for the corresponding marker
+        for (let item of itineraryMarkers) {
+            if (item.lat === lat && item.lng === lng) {
+                item.marker.openPopup();
+                break;
+            }
+        }
+    }
+</script>
+
+{% endblock %}

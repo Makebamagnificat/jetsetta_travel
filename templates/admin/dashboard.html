@@ -1,60 +1,59 @@
+<!-- templates/admin/dashboard.html -->
 {% extends "base.html" %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-6 py-12">
-    <h2 class="text-3xl font-semibold text-amber-300 mb-8">Admin Dashboard</h2>
+    <h1 class="text-5xl font-light tracking-tight mb-8">Admin Dashboard</h1>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-
-        <!-- Users Card -->
-        <div class="bg-zinc-900 p-6 rounded-xl shadow-md hover:shadow-2xl transition transform hover:-translate-y-2">
-            <h3 class="text-xl font-semibold text-amber-300 mb-3">Users</h3>
-            <p class="text-gray-300 mb-4">Manage all registered users.</p>
-            <a href="{{ url_for('admin.users') }}" class="gold-button px-4 py-2 rounded-lg text-sm font-semibold">View Users</a>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Users -->
+        <div class="bg-zinc-900 rounded-3xl p-8 hover:bg-zinc-800 transition">
+            <p class="text-amber-400 text-sm">Users</p>
+            <p class="text-2xl font-medium mt-2">Manage all registered users.</p>
+            <a href="{{ url_for('admin.users') }}" class="mt-6 inline-block bg-amber-400 text-black px-6 py-3 rounded-2xl text-sm font-semibold">View Users</a>
         </div>
 
-        <!-- All Bookings Card -->
-        <div class="bg-zinc-900 p-6 rounded-xl shadow-md hover:shadow-2xl transition transform hover:-translate-y-2">
-            <h3 class="text-xl font-semibold text-amber-300 mb-3">All Bookings</h3>
-            <p class="text-gray-300 mb-4">View every booking made by users.</p>
-            <a href="{{ url_for('admin.bookings') }}" class="gold-button px-4 py-2 rounded-lg text-sm font-semibold">View Bookings</a>
+        <!-- All Bookings -->
+        <div class="bg-zinc-900 rounded-3xl p-8 hover:bg-zinc-800 transition">
+            <p class="text-amber-400 text-sm">All Bookings</p>
+            <p class="text-2xl font-medium mt-2">View every booking made by users.</p>
+            <a href="{{ url_for('admin.bookings') }}" class="mt-6 inline-block bg-amber-400 text-black px-6 py-3 rounded-2xl text-sm font-semibold">View Bookings</a>
         </div>
 
-        <!-- Pending Bookings Card -->
-        <div class="bg-zinc-900 p-6 rounded-xl shadow-md hover:shadow-2xl transition transform hover:-translate-y-2">
-            <h3 class="text-xl font-semibold text-amber-300 mb-3">Pending Bookings</h3>
-            <p class="text-gray-300 mb-4">Confirm pending bookings.</p>
-            <a href="{{ url_for('admin.pending_bookings') }}" class="gold-button px-4 py-2 rounded-lg text-sm font-semibold">View Pending</a>
+        <!-- Pending Bookings -->
+        <div class="bg-zinc-900 rounded-3xl p-8 hover:bg-zinc-800 transition">
+            <p class="text-amber-400 text-sm">Pending Bookings</p>
+            <p class="text-2xl font-medium mt-2">Confirm pending bookings.</p>
+            <a href="{{ url_for('admin.bookings') }}" class="mt-6 inline-block bg-amber-400 text-black px-6 py-3 rounded-2xl text-sm font-semibold">View Pending</a>
         </div>
 
-        <!-- Confirmed Bookings Card -->
-        <div class="bg-zinc-900 p-6 rounded-xl shadow-md hover:shadow-2xl transition transform hover:-translate-y-2">
-            <h3 class="text-xl font-semibold text-amber-300 mb-3">Confirmed Bookings</h3>
-            <p class="text-gray-300 mb-4">See all confirmed bookings.</p>
-            <a href="{{ url_for('admin.confirmed_bookings') }}" class="gold-button px-4 py-2 rounded-lg text-sm font-semibold">View Confirmed</a>
+        <!-- Confirmed Bookings -->
+        <div class="bg-zinc-900 rounded-3xl p-8 hover:bg-zinc-800 transition">
+            <p class="text-amber-400 text-sm">Confirmed Bookings</p>
+            <p class="text-2xl font-medium mt-2">See all confirmed bookings.</p>
+            <a href="{{ url_for('admin.bookings') }}" class="mt-6 inline-block bg-amber-400 text-black px-6 py-3 rounded-2xl text-sm font-semibold">View Confirmed</a>
         </div>
 
-        <!-- Pending RSVPs Card -->
-        <div class="bg-zinc-900 p-6 rounded-xl shadow-md hover:shadow-2xl transition transform hover:-translate-y-2">
-            <h3 class="text-xl font-semibold text-amber-300 mb-3">Pending RSVPs</h3>
-            <p class="text-gray-300 mb-4">Approve or manage RSVPs.</p>
-            <a href="{{ url_for('admin.pending_rsvps') }}" class="gold-button px-4 py-2 rounded-lg text-sm font-semibold">View RSVPs</a>
+        <!-- Pending RSVPs -->
+        <div class="bg-zinc-900 rounded-3xl p-8 hover:bg-zinc-800 transition">
+            <p class="text-amber-400 text-sm">Pending RSVPs</p>
+            <p class="text-2xl font-medium mt-2">Approve or manage RSVPs.</p>
+            <a href="{{ url_for('admin.rsvps') }}" class="mt-6 inline-block bg-amber-400 text-black px-6 py-3 rounded-2xl text-sm font-semibold">View RSVPs</a>
         </div>
 
-        <!-- Activities Card -->
-        <div class="bg-zinc-900 p-6 rounded-xl shadow-md hover:shadow-2xl transition transform hover:-translate-y-2">
-            <h3 class="text-xl font-semibold text-amber-300 mb-3">Activities</h3>
-            <p class="text-gray-300 mb-4">View all activity RSVPs.</p>
-            <a href="{{ url_for('admin.activities') }}" class="gold-button px-4 py-2 rounded-lg text-sm font-semibold">View Activities</a>
+        <!-- Activities -->
+        <div class="bg-zinc-900 rounded-3xl p-8 hover:bg-zinc-800 transition">
+            <p class="text-amber-400 text-sm">Activities</p>
+            <p class="text-2xl font-medium mt-2">View all activity RSVPs.</p>
+            <a href="{{ url_for('admin.rsvps') }}" class="mt-6 inline-block bg-amber-400 text-black px-6 py-3 rounded-2xl text-sm font-semibold">View Activities</a>
         </div>
 
-        <!-- Itineraries Card -->
-        <div class="bg-zinc-900 p-6 rounded-xl shadow-md hover:shadow-2xl transition transform hover:-translate-y-2">
-            <h3 class="text-xl font-semibold text-amber-300 mb-3">Itineraries</h3>
-            <p class="text-gray-300 mb-4">Manage daily itineraries and activities.</p>
-            <a href="{{ url_for('admin.itineraries') }}" class="gold-button px-4 py-2 rounded-lg text-sm font-semibold">View Itineraries</a>
+        <!-- Itineraries -->
+        <div class="bg-zinc-900 rounded-3xl p-8 hover:bg-zinc-800 transition">
+            <p class="text-amber-400 text-sm">Itineraries</p>
+            <p class="text-2xl font-medium mt-2">Manage daily itineraries and activities.</p>
+            <a href="{{ url_for('admin.itineraries') }}" class="mt-6 inline-block bg-amber-400 text-black px-6 py-3 rounded-2xl text-sm font-semibold">View Itineraries</a>
         </div>
-
     </div>
 </div>
 {% endblock %}

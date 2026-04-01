@@ -5,12 +5,11 @@
 <div class="max-w-7xl mx-auto px-6 py-12">
     <div class="flex justify-between items-end mb-10">
         <div>
-            <h1 class="text-5xl font-light tracking-tight">Your Ghana Tour Itinerary</h1>
-            <p class="text-amber-300">June 15 – 22, 2026 • Private luxury Experience</p>
+            <h1 class="text-5xl font-light tracking-tight">Your Santorini Itinerary</h1>
+            <p class="text-amber-300">June 15 – 22, 2026 • Private Villa Experience</p>
         </div>
     </div>
 
-    <!-- Itinerary Cards -->
     <div class="space-y-8 mb-16">
         {% for item in itineraries %}
         <div class="bg-zinc-900 rounded-3xl p-8 flex flex-col md:flex-row gap-8 card-hover">
@@ -22,21 +21,12 @@
             <div class="flex-1">
                 <h3 class="text-2xl font-medium">{{ item.title }}</h3>
                 <p class="text-amber-200 mt-4 leading-relaxed">{{ item.description }}</p>
-                
-                <div class="mt-6 text-sm text-amber-400 flex items-center gap-2">
-                    📍 
-                    <span onclick="flyTo({{ item.location_lat or 36.3932 }}, {{ item.location_lng or 25.4617 }})" 
-                          class="cursor-pointer underline hover:text-white">
-                        View on Live Map
-                    </span>
-                </div>
             </div>
 
-            <div class="md:w-52 flex items-center">
+            <div class="md:w-52">
                 <form method="POST" action="{{ url_for('user.accept_activity', itinerary_id=item.id) }}">
-                    <button type="submit" 
-                            class="w-full gold-button py-6 rounded-3xl text-lg font-semibold">
-                        Accept &amp; Join
+                    <button type="submit" class="w-full gold-button py-6 rounded-3xl text-lg font-semibold">
+                        Accept & Join
                     </button>
                 </form>
             </div>
@@ -44,11 +34,9 @@
         {% endfor %}
     </div>
 
-    <!-- Live Map -->
     <div class="bg-zinc-900 rounded-3xl overflow-hidden">
         <div class="p-6 border-b border-amber-400/20">
             <h2 class="text-2xl">Live Geographical Map</h2>
-            <p class="text-amber-300 text-sm">Click any activity to fly to its location</p>
         </div>
         <div id="map" class="h-96 w-full"></div>
     </div>

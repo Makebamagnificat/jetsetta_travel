@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-black text-amber-300 p-6">
+
+    <!-- Title -->
+    <h1 class="text-3xl font-bold mb-6 tracking-wide">
+        ✨ All RSVPs
+    </h1>
+
+    <!-- Card Container -->
+    <div class="bg-zinc-900 rounded-2xl shadow-[0_0_25px_rgba(251,191,36,0.15)] border border-amber-400/20 overflow-hidden">
+
+        <table class="w-full text-left">
+
+            <!-- Table Header -->
+            <thead class="bg-amber-400 text-black">
+                <tr>
+                    <th class="p-4">User</th>
+                    <th class="p-4">Activity</th>
+                    <th class="p-4">Date</th>
+                </tr>
+            </thead>
+
+            <!-- Table Body -->
+            <tbody>
+                {% for rsvp in rsvps %}
+                <tr class="border-b border-zinc-800 hover:bg-zinc-800 transition">
+
+                    <td class="p-4 font-medium">
+                        {{ rsvp.user_id }}
+                    </td>
+
+                    <td class="p-4">
+                        {{ rsvp.activity_name }}
+                    </td>
+
+                    <td class="p-4 text-sm text-amber-200">
+                        {{ rsvp.created_at.strftime('%d %b %Y, %I:%M %p') }}
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+    <!-- Empty State -->
+    {% if rsvps|length == 0 %}
+    <div class="mt-6 text-center text-gray-400">
+        No RSVPs yet.
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

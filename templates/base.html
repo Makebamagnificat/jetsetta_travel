@@ -1,4 +1,3 @@
-<!-- templates/base.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,19 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jetsetta Travel & Tours</title>
     
-    <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome (Only one version - latest) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-    <!-- Inline Styles -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600&display=swap');
         
@@ -44,6 +35,9 @@
             box-shadow: 0 10px 15px -3px rgb(226 177 61);
         }
         
+        .nav-link {
+            transition: color 0.3s ease;
+        }
         .nav-link:hover { 
             color: #e2b13d; 
         }
@@ -57,69 +51,70 @@
 
 <body class="bg-black text-white">
 
-    <!-- Navbar -->
-    <nav class="bg-black border-b border-amber-400/30 sticky top-0 z-50">
+    <!-- Top Navigation Bar -->
+    <nav class="bg-zinc-900 border-b border-amber-400/30 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
+            
             <!-- Logo -->
             <div class="flex items-center gap-x-3">
                 <img src="{{ url_for('static', filename='images/logo.png') }}" 
-                     alt="Jetsetta Logo" class="h-12 w-auto">
+                     alt="Jetsetta Logo" class="h-11 w-auto">
                 <div>
                     <h1 class="logo-font text-4xl tracking-tighter text-[#e2b13d]">Jetsetta</h1>
                     <p class="text-xs tracking-[2px] text-amber-200 -mt-1">TRAVEL &amp; TOURS</p>
                 </div>
             </div>
 
-            <!-- Menu -->
+            <!-- Main Navigation -->
             <div class="hidden md:flex items-center gap-x-8 text-sm font-medium">
                 <a href="{{ url_for('user.index') }}" class="nav-link">Home</a>
                 <a href="{{ url_for('user.itineraries') }}" class="nav-link">Itineraries</a>
-                <a href="{{ url_for('user.bookings') }}" class="nav-link">Bookings</a>
-                <a href="{{ url_for('user.reviews') }}" class="nav-link">Reviews</a>
+                <a href="{{ url_for('user.bookings') }}" class="nav-link">My Bookings</a>
+                <a href="{{ url_for('user.dashboard') }}" class="nav-link">Dashboard</a>
             </div>
 
-            <!-- Right side -->
-            <div class="flex items-center gap-x-6">
-                <!-- Weather Widget -->
-                <div onclick="getWeather()" 
-                     class="hidden md:flex items-center gap-x-3 bg-zinc-900 hover:bg-zinc-800 px-5 py-2.5 rounded-3xl cursor-pointer border border-amber-400/20">
-                    <span id="weather-city" class="text-sm font-medium">Accra</span>
-                    <span id="weather-temp" class="text-2xl font-semibold text-[#e2b13d]">28°</span>
-                    <span id="weather-icon" class="text-3xl">⛅</span>
-                </div>
+            <!-- Live Weather Widget -->
+            <div onclick="getWeather()" 
+                 class="hidden md:flex items-center gap-x-3 bg-zinc-800 hover:bg-zinc-700 px-5 py-2.5 rounded-3xl cursor-pointer border border-amber-400/20 transition">
+                <span id="weather-icon" class="text-2xl">⛅</span>
+                <span id="weather-temp" class="font-semibold text-[#e2b13d]">28°</span>
+                <span id="weather-city" class="text-sm">Accra</span>
+            </div>
 
+            <!-- Right Side: User Info -->
+            <div class="flex items-center gap-x-5">
                 {% if current_user.is_authenticated %}
-                <div class="flex items-center gap-x-3 bg-zinc-900 px-5 py-2 rounded-3xl">
-                    <div class="w-9 h-9 bg-amber-400 text-black rounded-2xl flex items-center justify-center font-bold text-lg">
-                        {{ current_user.name[0].upper() }}
+                    <div class="flex items-center gap-x-3 bg-zinc-800 px-5 py-2.5 rounded-3xl">
+                        <div class="w-9 h-9 bg-amber-400 text-black rounded-2xl flex items-center justify-center font-bold">
+                            {{ current_user.name[0].upper() }}
+                        </div>
+                        <div class="text-sm">
+                            <p class="font-medium">{{ current_user.name }}</p>
+                            <p class="text-xs text-amber-300">{{ current_user.role|title }}</p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-sm font-semibold">{{ current_user.name }}</p>
-                        <p class="text-xs text-amber-300 -mt-0.5">{{ current_user.role }}</p>
-                    </div>
-                </div>
 
-                {% if current_user.role == 'admin' %}
-                <a href="{{ url_for('admin.dashboard') }}" 
-                   class="px-6 py-3 bg-amber-400 text-black rounded-3xl text-sm font-semibold hover:bg-amber-300">
-                    Admin Portal
-                </a>
-                {% endif %}
+                    {% if current_user.role == 'admin' %}
+                    <a href="{{ url_for('admin.dashboard') }}" 
+                       class="gold-button px-6 py-3 rounded-3xl text-sm font-medium">
+                        Admin Portal
+                    </a>
+                    {% endif %}
 
-                <a href="{{ url_for('auth.logout') }}" 
-                   class="text-sm hover:text-red-400 transition">Logout</a>
+                    <a href="{{ url_for('auth.logout') }}" 
+                       class="text-sm hover:text-red-400 transition">Logout</a>
                 {% else %}
-                <a href="{{ url_for('auth.login') }}" 
-                   class="px-7 py-3 border border-amber-400 rounded-3xl hover:bg-amber-400 hover:text-black transition">
-                    Sign In
-                </a>
+                    <a href="{{ url_for('auth.login') }}" 
+                       class="px-7 py-3 border border-amber-400 rounded-3xl hover:bg-amber-400 hover:text-black transition text-sm">
+                        Sign In
+                    </a>
                 {% endif %}
             </div>
         </div>
     </nav>
 
     <!-- Flash Messages -->
-    <div id="flash-container" class="fixed top-6 right-6 z-50 space-y-3"></div>
+    <div id="flash-container" class="fixed top-6 right-6 z-[100] space-y-3"></div>
 
     <!-- Main Content -->
     {% block content %}{% endblock %}
@@ -128,26 +123,17 @@
     <footer class="bg-black border-t border-amber-400/30 mt-20">
         <div class="max-w-7xl mx-auto px-6 py-12 text-center">
             <p class="text-amber-300 mb-6 text-sm">Follow us on social media:</p>
-            
             <div class="flex justify-center gap-10 text-4xl mb-10">
-                <!-- Instagram -->
-                <a href="https://www.instagram.com/jetsettatravel?igsh=MXd5eGZzZm5vbDY4bA==" 
-                   target="_blank" 
-                   class="hover:scale-110 transition-transform text-[#e2b13d]">
+                <a href="https://www.instagram.com/jetsettatravel?igsh=MXd5eGZzZm5vbDY4bA==" target="_blank" class="hover:scale-110 transition text-[#e2b13d]">
                     <i class="fab fa-instagram"></i>
                 </a>
-                
-                <!-- Facebook -->
-                <a href="#" target="_blank" class="hover:scale-110 transition-transform text-[#e2b13d]">
+                <a href="#" target="_blank" class="hover:scale-110 transition text-[#e2b13d]">
                     <i class="fab fa-facebook"></i>
                 </a>
-                
-                <!-- Twitter / X -->
-                <a href="#" target="_blank" class="hover:scale-110 transition-transform text-[#e2b13d]">
+                <a href="#" target="_blank" class="hover:scale-110 transition text-[#e2b13d]">
                     <i class="fab fa-twitter"></i>
                 </a>
             </div>
-
             <p class="text-amber-300 text-xs">
                 © 2026 Jetsetta Travel & Tours. All Rights Reserved.
             </p>
@@ -157,8 +143,232 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <!-- Main JS -->
+    <!-- Smart AI Chat Assistant with Persistence + Typing Animation -->
+    <div id="chat-widget" class="fixed bottom-6 right-6 z-50">
+        <button onclick="toggleChat()" 
+                class="w-16 h-16 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all text-3xl border-2 border-white/30">
+            💬
+        </button>
+    </div>
+
+    <div id="chat-window" class="hidden fixed bottom-24 right-6 w-96 bg-zinc-900 rounded-3xl shadow-2xl border border-amber-400/30 overflow-hidden z-50 flex flex-col" style="height: 560px;">
+        <div class="bg-gradient-to-r from-amber-500 to-yellow-600 px-6 py-4 flex items-center justify-between flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 bg-white/20 rounded-2xl flex items-center justify-center text-2xl">✨</div>
+                <div>
+                    <p class="font-semibold text-white text-lg">Jetsetta Assistant</p>
+                    <p class="text-xs text-amber-100">Remembers your conversation</p>
+                </div>
+            </div>
+            <button onclick="toggleChat()" class="text-white text-3xl leading-none hover:text-amber-200">×</button>
+        </div>
+
+        <div id="chat-messages" class="flex-1 p-5 overflow-y-auto bg-zinc-950 space-y-4 text-sm"></div>
+
+        <div class="px-5 py-3 border-t border-amber-400/20 bg-zinc-900">
+            <p class="text-amber-300 text-xs mb-2">Suggested for you:</p>
+            <div class="flex flex-wrap gap-2" id="suggested-questions"></div>
+        </div>
+
+        <div class="p-4 border-t border-amber-400/20 bg-zinc-900 flex-shrink-0">
+            <div class="flex gap-2">
+                <input id="chat-input" 
+                       type="text" 
+                       placeholder="Ask anything about your trip..." 
+                       class="flex-1 bg-zinc-800 border border-amber-400/30 rounded-3xl px-5 py-3 text-sm focus:outline-none focus:border-amber-400"
+                       onkeypress="if(event.key === 'Enter') sendMessage()">
+                <button onclick="sendMessage()" 
+                        class="gold-button px-7 rounded-3xl font-medium text-sm">
+                    Send
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    <!-- AI Chat Script -->
+    <script>
+        // Real user data from Flask
+        const userData = {
+            name: "{{ current_user.name if current_user.is_authenticated else 'Guest' }}",
+            bookings: [
+                {% for booking in bookings %}
+                { id: {{ booking.id }}, title: "{{ booking.title }}", status: "{{ booking.status }}" },
+                {% endfor %}
+            ],
+            itineraries: [
+                {% for item in itineraries %}
+                { title: "{{ item.title }}", date: "{{ item.date_str }}" },
+                {% endfor %}
+            ]
+        };
+
+        let conversationHistory = [];
+
+        function loadConversation() {
+            const saved = localStorage.getItem('jetsetta_chat_history');
+            if (saved) conversationHistory = JSON.parse(saved);
+        }
+
+        function saveConversation() {
+            localStorage.setItem('jetsetta_chat_history', JSON.stringify(conversationHistory));
+        }
+
+        function toggleChat() {
+            const chatWindow = document.getElementById('chat-window');
+            chatWindow.classList.toggle('hidden');
+            
+            if (!chatWindow.classList.contains('hidden')) {
+                if (conversationHistory.length === 0) {
+                    const greeting = `Hello ${userData.name.split(' ')[0]}! 👋 How can I help with your Ghana trip today?`;
+                    addMessage("assistant", greeting);
+                    conversationHistory.push({role: "assistant", content: greeting});
+                    saveConversation();
+                } else {
+                    renderConversation();
+                }
+                showDynamicSuggestedQuestions();
+            }
+        }
+
+        function renderConversation() {
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = '';
+            conversationHistory.forEach(msg => addMessage(msg.role, msg.content, true));
+        }
+
+        function addMessage(sender, text, isRestoring = false) {
+            const container = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            
+            if (sender === "user") {
+                div.className = "flex justify-end";
+                div.innerHTML = `<div class="bg-amber-500 text-black max-w-[85%] rounded-3xl rounded-tr-none px-5 py-3">${text}</div>`;
+            } else {
+                div.className = "flex justify-start";
+                div.innerHTML = `<div class="bg-zinc-800 max-w-[85%] rounded-3xl rounded-tl-none px-5 py-3">${text}</div>`;
+            }
+            
+            container.appendChild(div);
+            if (!isRestoring) container.scrollTop = container.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const container = document.getElementById('chat-messages');
+            const typingId = 'typing-' + Date.now();
+            const typingDiv = document.createElement('div');
+            typingDiv.id = typingId;
+            typingDiv.className = "flex justify-start";
+            typingDiv.innerHTML = `
+                <div class="bg-zinc-800 max-w-[85%] rounded-3xl rounded-tl-none px-5 py-3 flex items-center gap-2">
+                    <span class="text-amber-400">Jetsetta is typing</span>
+                    <span class="typing-dots text-amber-400">...</span>
+                </div>
+            `;
+            container.appendChild(typingDiv);
+            container.scrollTop = container.scrollHeight;
+            return typingId;
+        }
+
+        function removeTypingIndicator(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function showDynamicSuggestedQuestions() {
+            const container = document.getElementById('suggested-questions');
+            container.innerHTML = '';
+
+            if (userData.bookings && userData.bookings.length > 0) {
+                userData.bookings.forEach(booking => {
+                    if (booking.status === 'pending') {
+                        const btn = document.createElement('button');
+                        btn.className = "text-xs bg-amber-400 hover:bg-amber-500 text-black px-4 py-2 rounded-3xl transition";
+                        btn.textContent = `How do I pay for ${booking.title}?`;
+                        btn.onclick = () => { 
+                            document.getElementById('chat-input').value = btn.textContent; 
+                            sendMessage(); 
+                        };
+                        container.appendChild(btn);
+                    }
+                });
+            }
+
+            const general = ["What’s on my itinerary?", "Tell me about my bookings", "Weather in Accra?", "When is airport pickup?"];
+            general.forEach(text => {
+                const btn = document.createElement('button');
+                btn.className = "text-xs bg-zinc-800 hover:bg-amber-400 hover:text-black px-4 py-2 rounded-3xl transition";
+                btn.textContent = text;
+                btn.onclick = () => { 
+                    document.getElementById('chat-input').value = text; 
+                    sendMessage(); 
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addMessage("user", message);
+            conversationHistory.push({role: "user", content: message});
+            saveConversation();
+            input.value = '';
+
+            const typingId = showTypingIndicator();
+
+            setTimeout(() => {
+                removeTypingIndicator(typingId);
+                let reply = getSmartReply(message);
+                addMessage("assistant", reply);
+                conversationHistory.push({role: "assistant", content: reply});
+                saveConversation();
+            }, 1100);
+        }
+
+        function getSmartReply(message) {
+            const lower = message.toLowerCase();
+
+            if (lower.includes("booking") || lower.includes("pay") || lower.includes("confirmed")) {
+                if (userData.bookings.length > 0) {
+                    let list = userData.bookings.map(b => `• ${b.title} (${b.status.toUpperCase()})`).join("<br>");
+                    return `Here are your current bookings:<br>${list}`;
+                }
+                return "You don’t have any bookings yet.";
+            }
+
+            if (lower.includes("itinerary") || lower.includes("schedule")) {
+                if (userData.itineraries.length > 0) {
+                    let list = userData.itineraries.map(i => `• ${i.title} on ${i.date}`).join("<br>");
+                    return `Your Ghana itinerary includes:<br>${list}`;
+                }
+                return "Your luxury trip runs from July 7th to 14th, 2026.";
+            }
+
+            if (lower.includes("weather") || lower.includes("accra")) {
+                return "Accra is currently sunny ☀️ with temperatures around 28–32°C.";
+            }
+
+            if (lower.includes("airport") || lower.includes("pickup")) {
+                return "VIP airport pickup is included on Day 1 at Accra International Airport.";
+            }
+
+            if (lower.includes("kakum") || lower.includes("canopy")) {
+                return "Kakum Canopy Walk is on Day 3. Wear comfortable shoes and bring water!";
+            }
+
+            return "Great question! For urgent help, you can also WhatsApp us: <a href='https://wa.me/233535754074' target='_blank' class='text-amber-400 underline'>+233 535 754 074</a>";
+        }
+
+        // Load saved conversation
+        window.addEventListener('load', () => {
+            loadConversation();
+        });
+    </script>
 
     <!-- Flash Messages Auto-dismiss -->
     <script>
@@ -172,5 +382,6 @@
             });
         });
     </script>
+
 </body>
 </html>

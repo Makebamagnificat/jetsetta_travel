@@ -1,0 +1,71 @@
+<!-- templates/checkout.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-6 py-16">
+    <div class="bg-zinc-900 rounded-3xl p-12">
+        <h1 class="text-4xl font-light mb-2">Daily Payment</h1>
+        <p class="text-amber-300 mb-10">Secure daily checkout powered by Paystack</p>
+
+        <div class="bg-black/50 rounded-2xl p-10 mb-10">
+            <h3 class="text-2xl font-light">{{ booking.title }}</h3>
+            <p class="text-amber-200 mt-2">Luxury Ghana Experience</p>
+
+            <!-- Daily Pricing - Prominent Display -->
+            <div class="mt-10 flex justify-center gap-16">
+                <div class="text-center">
+                    <div class="text-6xl font-light text-white">$242.86</div>
+                    <div class="text-sm text-amber-300 mt-2">USD per day</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-6xl font-light text-[#e2b13d]">GHS 2,676.31</div>
+                    <div class="text-sm text-amber-300 mt-2">Ghana Cedis per day</div>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center">
+                <p class="text-xs text-amber-400">This is your daily rate after the $300 deposit</p>
+                <p class="text-amber-300 text-sm mt-1">Total package: $2,000 • Deposit already paid: $300</p>
+            </div>
+        </div>
+
+        <!-- Pay Now Button -->
+        <button onclick="startPaystackPayment()" 
+                class="w-full gold-button py-7 text-2xl font-semibold rounded-3xl flex items-center justify-center gap-4">
+            Pay ${{ booking.amount|round(2) }} Now with Paystack
+            <span class="text-3xl">💳</span>
+        </button>
+
+        <p class="text-center text-xs text-amber-300 mt-8">🔒 Secured by Paystack • Ghana Cedi (GHS)</p>
+    </div>
+
+    <div class="text-center mt-10">
+        <a href="{{ url_for('user.bookings') }}" 
+           class="text-amber-300 hover:text-white transition">← Back to My Bookings</a>
+    </div>
+</div>
+
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+function startPaystackPayment() {
+    let handler = PaystackPop.setup({
+        key: "{{ paystack_public_key }}",
+        email: "{{ current_user.email }}",
+        amount: {{ (booking.amount * 100) | int }},   // amount in kobo
+        currency: "GHS",
+        ref: "{{ reference }}",
+        metadata: {
+            booking_id: {{ booking.id }},
+            user_id: {{ current_user.id }}
+        },
+        callback: function(response) {
+            window.location.href = "{{ url_for('user.payment_success') }}?reference=" + response.reference;
+        },
+        onClose: function() {
+            alert("Payment cancelled");
+        }
+    });
+    handler.openIframe();
+}
+</script>
+{% endblock %}

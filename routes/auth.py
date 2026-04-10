@@ -1,14 +1,15 @@
-# routes/auth.py - Debug Version
+# routes/auth.py
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
-from models import db, User
+from models import User 
+from extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
 
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    print("=== LOGIN ROUTE CALLED ===")   # Debug line
+    print("=== LOGIN ROUTE CALLED ===")
     
     if current_user.is_authenticated:
         print("User already authenticated, redirecting to dashboard")
@@ -18,13 +19,16 @@ def login():
         email = request.form.get('email')
         password = request.form.get('password')
         
-        print(f"Login attempt with email: {email}")   # Debug
+        print(f"Login attempt with email: {email}")
         
         if not email or not password:
             flash('Please enter both email and password', 'danger')
             return render_template('login.html')
         
-        user = User.query.filter_by(email=email.strip().lower()).first()
+        # Clean email
+        email = email.strip().lower()
+        
+        user = User.query.filter_by(email=email).first()
         
         if user:
             print(f"User found: {user.email}, checking password...")
@@ -33,12 +37,11 @@ def login():
                 login_user(user)
                 flash(f'Welcome back, {user.name}!', 'success')
                 
-                if user.role == 'admin':
+                if user.role == "admin":
                     print("Redirecting to admin dashboard")
                     return redirect(url_for('admin.dashboard'))
-                else:
-                    print("Redirecting to user dashboard")
-                    return redirect(url_for('user.dashboard'))
+                print("Redirecting to user dashboard")
+                return redirect(url_for('user.dashboard'))
             else:
                 print("Password incorrect")
                 flash('Invalid email or password', 'danger')
@@ -63,21 +66,26 @@ def signup():
             flash('All fields are required', 'danger')
             return render_template('signup.html')
         
-        if User.query.filter_by(email=email.strip().lower()).first():
+        email = email.strip().lower()
+        
+        if User.query.filter_by(email=email).first():
             flash('Email already registered. Please login.', 'danger')
             return redirect(url_for('auth.login'))
         
         new_user = User(
             name=name.strip(),
-            email=email.strip().lower(),
+            email=email,
             password=generate_password_hash(password),
             role='user'
         )
         
         db.session.add(new_user)
         db.session.commit()
+
+        login_user(new_user)
+        flash(f'Welcome, {new_user.name}! Your account has been created.', 'success')
         
-        flash('Account created successfully! Please log in.', 'success')
+        
         return redirect(url_for('auth.login'))
     
     return render_template('signup.html')

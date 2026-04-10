@@ -1,92 +1,121 @@
-# seed.py - Final Fixed Version
-from app import create_app
-from models import db, User, Itinerary, Booking
+# seed.py
+from app import create_app, db
+from models import User, Itinerary, Booking, ActivityRSVP, Review
 from werkzeug.security import generate_password_hash
 
 app = create_app()
 
 with app.app_context():
-    db.create_all()
-    print("🌍 Database in use:", app.config['SQLALCHEMY_DATABASE_URI'])
+    print("🌍 Seeding Ghana Luxury Travel Experience with Real Coordinates...")
+
+    # Delete dependent records first (important order)
+    db.session.query(ActivityRSVP).delete()
+    db.session.query(Booking).delete()
+    db.session.query(Review).delete()
+    db.session.query(Itinerary).delete()
+    db.session.query(User).delete()
+    db.session.commit()
 
     # Create Admin
-    admin = User.query.filter_by(email="admin@jetsetta.com").first()
-    if not admin:
-        admin = User(
-            name="Jetsetta Admin",
-            email="admin@jetsetta.com",
-            password=generate_password_hash("admin123"),
-            role="admin"
-        )
-        db.session.add(admin)
-        print("✅ Admin created: admin@jetsetta.com / admin123")
+    admin = User(
+        name="Admin",
+        email="admin@jetsetta.com",
+        password=generate_password_hash("admin123"),
+        role="admin"
+    )
+    db.session.add(admin)
 
-    # Mary Johnson (Main Test User)
-    mary = User.query.filter_by(email="mary@jetsetta.com").first()
-    if not mary:
-        mary = User(
-            name="Mary Johnson",
-            email="mary@jetsetta.com",
-            password=generate_password_hash("password123"),
-            role="user"
-        )
-        db.session.add(mary)
-        print("✅ User created: mary@jetsetta.com / password123")
-    
-    
+    # Create Test User
+    user = User(
+        name="Mary Johnson",
+        email="mary@jetsetta.com",
+        password=generate_password_hash("password123"),
+        role="user"
+    )
+    db.session.add(user)
+    db.session.commit()
 
+    # Ghana Luxury Itineraries with Real Coordinates (7th - 14th July 2026)
+    itineraries_data = [
+        {
+        "day": "Day 1", 
+        "title": "VIP Arrival in Accra",
+        "description": "Private airport pickup and transfer to your luxury villa with welcome Ghanaian dinner.",
+        "date_str": "2026-07-07",
+        "latitude": 5.6052, 
+        "longitude": -0.1668,
+        "location_name": "Accra International Airport, Accra"
+        },
+        {
+            "day": "Day 2", "title": "Accra Heritage Tour",
+            "description": "Explore Jamestown, Kwame Nkrumah Mausoleum and vibrant local markets.",
+            "date_str": "2026-07-08",
+            "latitude":5.5400, "longitude": -0.2100,
+            "location_name": "Jamestown, Accra"
+        },
+        {
+            "day": "Day 3", "title": "Kakum National Park Canopy Walk",
+            "description": "Experience the famous canopy walkway through the rainforest.",
+            "date_str": "2026-07-09",
+            "latitude": 5.3536, "longitude": -1.3833,
+            "location_name": "Kakum National Park"
+        },
+        {
+            "day": "Day 4", "title": "Cape Coast & Elmina Castle Tour",
+            "description": "Visit UNESCO World Heritage castles with a private historian guide.",
+            "date_str": "2026-07-10",
+            "latitude": 5.1036, "longitude": -1.2410,
+            "location_name": "Cape Coast Castle"
+        },
+        {
+            "day": "Day 5", "title": "Lake Volta Cruise & Akosombo",
+            "description": "Luxury boat cruise on the world's largest man-made lake with sunset dinner.",
+            "date_str": "2026-07-11",
+            "latitude": 6.3000, "longitude": 0.0500,
+            "location_name": "Lake Volta, Akosombo"
+        },
+        {
+            "day": "Day 6", "title": "Kumasi Ashanti Cultural Experience",
+            "description": "Visit Manhyia Palace and enjoy traditional Ashanti drumming and dance.",
+            "date_str": "2026-07-12",
+            "latitude": 6.6885, "longitude": -1.6244,
+            "location_name": "Manhyia Palace, Kumasi"
+        },
+        {
+            "day": "Day 7", "title": "Aburi Botanical Gardens & Mountain Retreat",
+            "description": "Relax at the beautiful Aburi Botanical Gardens with stunning mountain views.",
+            "date_str": "2026-07-13",
+            "latitude": 5.8500, "longitude": -0.1800,
+            "location_name": "Aburi Botanical Gardens"
+        },
+        {
+            "day": "Day 8", "title": "Spa Day and Departure",
+            "description": "Relax at the spa and luxury escort to the airport for departure.",
+            "date_str": "2026-07-14",
+            "latitude": 5.6052, "longitude": -0.1668,
+            "location_name": "Kotoka International Airport, Accra"
+        }
+    ]    
 
-    # ==================== GHANA LUXURY ITINERARY (10 Activities) ====================
-    if Itinerary.query.count() == 0:
-        ghana_itineraries = [
-            {"day": "Day 1", "date_str": "15 Jun 2026", "title": "VIP Arrival in Accra", 
-             "description": "Private airport pickup from Kotoka International Airport. Transfer to luxury villa in Airport Residential Area with welcome Ghanaian cocktail.", 
-             "location_lat": 5.6037, "location_lng": -0.1870},
-
-            {"day": "Day 2", "date_str": "16 Jun 2026", "title": "Accra Heritage & Food Tour", 
-             "description": "Private tour of Kwame Nkrumah Mausoleum and Independence Square. Lunch featuring Jollof Rice, Waakye and fresh palm wine tasting.", 
-             "location_lat": 5.5557, "location_lng": -0.1963},
-
-            {"day": "Day 3", "date_str": "17 Jun 2026", "title": "Cape Coast & Elmina Castle", 
-             "description": "Luxury drive to Cape Coast Castle and Elmina Castle (UNESCO). Private historian guide with afternoon high tea at a oceanside resort.", 
-             "location_lat": 5.1030, "location_lng": -1.2460},
-
-            {"day": "Day 4", "date_str": "18 Jun 2026", "title": "Kakum National Park Canopy Walk", 
-             "description": "Early morning canopy walkway experience with expert naturalist. Breakfast picnic with Ghanaian pastries and fresh fruits.", 
-             "location_lat": 5.3500, "location_lng": -1.3830},
-
-            {"day": "Day 5", "date_str": "19 Jun 2026", "title": "Lake Volta Luxury Cruise", 
-             "description": "Private yacht cruise on Lake Volta with Dodi Island stop. Ghanaian seafood lunch featuring grilled tilapia and banku.", 
-             "location_lat": 6.3000, "location_lng": 0.0500},
-
-            {"day": "Day 6", "date_str": "20 Jun 2026", "title": "Kumasi Ashanti Kingdom Experience", 
-             "description": "Private visit to Manhyia Palace. Traditional Kente weaving demonstration and Adowa cultural dance performance.", 
-             "location_lat": 6.6885, "location_lng": -1.6244},
-
-            {"day": "Day 7", "date_str": "21 Jun 2026", "title": "Aburi Botanical Gardens & Mountains", 
-             "description": "Relaxing day at Aburi Botanical Gardens with private picnic. Enjoy fresh coconut and local delicacies.", 
-             "location_lat": 5.8500, "location_lng": -0.1833},
-
-            {"day": "Day 8", "date_str": "22 Jun 2026", "title": "Ghanaian Cuisine Masterclass", 
-             "description": "Private cooking class with a top Accra chef. Learn to prepare Jollof Rice, Fufu with light soup, and Kelewele.", 
-             "location_lat": 5.6037, "location_lng": -0.1870},
-
-            {"day": "Day 9", "date_str": "23 Jun 2026", "title": "Shopping & Souvenirs", 
-             "description": "Private shopping tour at Art Centre and local craft villages. Curated selection of Kente cloth, beads and handicrafts.", 
-             "location_lat": 5.5557, "location_lng": -0.1963},
-
-            {"day": "Day 10", "date_str": "24 Jun 2026", "title": "Departure Day", 
-             "description": "Morning spa session at villa followed by VIP airport transfer with farewell gifts.", 
-             "location_lat": 5.6037, "location_lng": -0.1870},
-        ]
-        for data in ghana_itineraries:
-            activity = Itinerary(**data)
-            db.session.add(activity)
-
-        print("✅ 10 Ghana luxury itinerary activities added (including cuisine masterclass)")
+    for data in itineraries_data:
+        itinerary = Itinerary(**data)
+        db.session.add(itinerary)
 
     db.session.commit()
-    print("🎉 Enhanced Ghana seed data loaded successfully!")
-    print("\nLogin Details:")
-    print("Admin → admin@jetsetta.com / admin123")
-    print("User  → mary@jetsetta.com / password123")
+
+    # Sample pending booking for testing Pay Now
+    sample_booking = Booking(
+        user_id=user.id,
+        title="Kakum National Park Canopy Walk",
+        amount=154.140,
+        status="pending"
+    )
+    db.session.add(sample_booking)
+    db.session.commit()
+
+    print("✅ Admin: admin@jetsetta.com / admin123")
+    print("✅ User: mary@jetsetta.com / password123")
+    print(f"✅ {len(itineraries_data)} Itineraries added with real GPS coordinates")
+    print("✅ Sample pending booking created")
+
+    print("🌟 Seeding completed successfully!")

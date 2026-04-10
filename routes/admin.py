@@ -46,6 +46,11 @@ def bookings():
     all_bookings = Booking.query.all()
     return render_template('admin/bookings.html', bookings=all_bookings)
 
+@admin_bp.route('/bookings/pending')
+@admin_required
+def pending_bookings():
+    bookings = Booking.query.filter_by(status='pending').order_by(Booking.created_at.desc()).all()
+    return render_template('admin/bookings.html', bookings=bookings, filter='pending')
 
 @admin_bp.route('/bookings/confirm/<int:booking_id>')
 @admin_required
@@ -55,6 +60,13 @@ def confirm_booking(booking_id):
     db.session.commit()
     flash('Booking confirmed successfully!', 'success')
     return redirect(url_for('admin.bookings'))
+
+
+@admin_bp.route('/bookings/confirmed')
+@admin_required
+def confirmed_bookings():
+    bookings = Booking.query.filter_by(status='confirmed').order_by(Booking.created_at.desc()).all()
+    return render_template('admin/bookings.html', bookings=bookings, filter='confirmed')
 
 
 @admin_bp.route('/itineraries')
@@ -83,6 +95,34 @@ def add_itinerary():
 def rsvps():
     all_rsvps = ActivityRSVP.query.order_by(ActivityRSVP.created_at.desc()).all()
     return render_template('admin/rsvps.html', rsvps=all_rsvps)
+
+@admin_bp.route('/rsvps/confirm/<int:rsvp_id>')
+@admin_required
+def confirm_rsvp(rsvp_id):
+    """Admin confirms a user's RSVP → creates confirmed Booking"""
+    rsvp = ActivityRSVP.query.get_or_404(rsvp_id)
+    
+    if rsvp.status == 'confirmed':
+        flash('This activity is already confirmed.', 'info')
+        return redirect(url_for('admin.rsvps'))
+    
+    # Create or update Booking
+    booking = Booking.query.filter_by(user_id=rsvp.user_id, title=rsvp.itinerary.title).first()
+    
+    if not booking:
+        booking = Booking(
+            user_id=rsvp.user_id,
+            title=rsvp.itinerary.title,
+            amount=150.00,  # You can make this dynamic later
+            status='confirmed'
+        )
+        db.session.add(booking)
+    
+    rsvp.status = 'confirmed'
+    db.session.commit()
+    
+    flash(f"✅ Confirmed: {rsvp.user.name} - {rsvp.itinerary.title}", 'success')
+    return redirect(url_for('admin.rsvps'))
 
 @admin_bp.route('/users/edit/<int:user_id>', methods=['GET', 'POST'])
 @admin_required
@@ -142,3 +182,5 @@ def delete_itinerary(itinerary_id):
     db.session.commit()
     flash("❌ Itinerary deleted successfully!")
     return redirect(url_for('admin.dashboard'))
+
+

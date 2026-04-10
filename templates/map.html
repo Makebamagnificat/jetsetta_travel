@@ -1,0 +1,107 @@
+<!-- templates/map.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-6 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-4xl font-light">{{ itinerary.title }}</h1>
+            <p class="text-amber-300">{{ itinerary.location_name or 'Ghana' }}</p>
+        </div>
+        <a href="{{ url_for('user.itineraries') }}" 
+           class="px-6 py-3 border border-amber-400 rounded-3xl hover:bg-amber-400 hover:text-black transition text-sm font-medium">
+            ← Back to Itineraries
+        </a>
+    </div>
+
+    <!-- Live Map Container -->
+    <div id="map" class="w-full h-[650px] rounded-3xl overflow-hidden border border-amber-400/20 shadow-2xl"></div>
+</div>
+
+<!-- Get Directions Button -->
+    <div class="mt-6 flex justify-center">
+        <a href="https://www.google.com/maps/dir/?api=1&destination={{ itinerary.latitude }},{{ itinerary.longitude }}&travelmode=driving" 
+           target="_blank"
+           class="inline-flex items-center gap-3 px-10 py-4 bg-white text-black hover:bg-amber-400 hover:text-black rounded-3xl font-medium transition text-lg shadow-lg">
+            <span>Get Directions</span>
+            <span class="text-2xl">🧭</span>
+        </a>
+    </div>
+</div>
+
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get coordinates safely with fallbacks
+        const lat = parseFloat("{{ itinerary.latitude }}") || 5.6052;
+        const lng = parseFloat("{{ itinerary.longitude }}") || -0.1668;
+
+        console.log("🗺️ Loading live map for:", "{{ itinerary.title }}", "at", lat, lng);
+
+        // Initialize map centered on the exact location
+        const map = L.map('map', {
+            zoomControl: true,
+            attributionControl: true
+        }).setView([lat, lng], 17);   // Higher zoom for better detail
+
+        // OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors • Jetsetta Travel',
+            maxZoom: 19
+        }).addTo(map);
+
+        // Large, prominent marker
+        const marker = L.marker([lat, lng], {
+            icon: L.divIcon({
+                className: 'custom-big-marker',
+                html: '<div style="font-size: 58px; filter: drop-shadow(0 0 8px #e2b13d);">📍</div>',
+                iconSize: [65, 65],
+                iconAnchor: [32, 58],
+                popupAnchor: [0, -55]
+            })
+        }).addTo(map)
+        .bindPopup(`
+            <b>{{ itinerary.title | tojson | safe }}</b><br>
+            {{ itinerary.location_name or 'Ghana' }}<br>
+            <small>${lat.toFixed(5)}, ${lng.toFixed(5)}</small>
+          `).openPopup();
+
+        // Rich popup
+        marker.bindPopup(`
+            <div style="text-align: center; min-width: 220px; padding: 8px;">
+                <b style="font-size: 18px; color: #e2b13d;">{{ itinerary.title | tojson | safe }}</b><br>
+                <span style="color: #ddd;">${itinerary.location_name || 'Ghana'}</span><br><br>
+                <small style="color: #aaa;">📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}</small>
+            </div>
+        `).openPopup();
+
+        // Gold highlight circle for better visibility
+        L.circle([lat, lng], {
+            color: '#e2b13d',
+            fillColor: '#e2b13d',
+            fillOpacity: 0.15,
+            radius: 1000
+        }).addTo(map);
+
+        // Fix map rendering issues
+        setTimeout(() => {
+            map.invalidateSize();
+        }, 400);
+    });
+</script>
+
+<style>
+    .custom-big-marker {
+        background: none;
+        border: none;
+    }
+    .leaflet-popup-content-wrapper {
+        background: #1f2937;
+        color: white;
+        border-radius: 12px;
+    }
+</style>
+{% endblock %}

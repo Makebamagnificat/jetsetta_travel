@@ -1,55 +1,81 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="min-h-screen bg-black text-amber-300 p-6">
+<div class="max-w-7xl mx-auto px-6 py-12">
 
-    <!-- Title -->
-    <h1 class="text-3xl font-bold mb-6 tracking-wide">
-        ✨ All RSVPs
-    </h1>
+    <div class="flex justify-between items-center mb-10">
+        <div>
+            <h1 class="text-4xl font-light tracking-tight">Activity RSVPs</h1>
+            <p class="text-amber-300 mt-1">Confirm user RSVPs so they appear in their bookings</p>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}"
+           class="px-6 py-3 border border-amber-400 rounded-3xl hover:bg-amber-400 hover:text-black transition">
+            ← Back to Dashboard
+        </a>
+    </div>
 
-    <!-- Card Container -->
-    <div class="bg-zinc-900 rounded-2xl shadow-[0_0_25px_rgba(251,191,36,0.15)] border border-amber-400/20 overflow-hidden">
+    <!-- Stats Strip -->
+    <div class="flex gap-4 mb-8">
+        <div class="bg-zinc-900 border border-amber-400/20 rounded-2xl px-6 py-4">
+            <div class="text-2xl font-light">{{ rsvps|length }}</div>
+            <div class="text-amber-300 text-sm">Total RSVPs</div>
+        </div>
+        <div class="bg-zinc-900 border border-amber-400/20 rounded-2xl px-6 py-4">
+            <div class="text-2xl font-light text-amber-400">{{ rsvps|selectattr('status','eq','pending')|list|length }}</div>
+            <div class="text-amber-300 text-sm">Pending</div>
+        </div>
+        <div class="bg-zinc-900 border border-amber-400/20 rounded-2xl px-6 py-4">
+            <div class="text-2xl font-light text-emerald-400">{{ rsvps|selectattr('status','eq','confirmed')|list|length }}</div>
+            <div class="text-amber-300 text-sm">Confirmed</div>
+        </div>
+    </div>
 
-        <table class="w-full text-left">
-
-            <!-- Table Header -->
-            <thead class="bg-amber-400 text-black">
-                <tr>
-                    <th class="p-4">User</th>
-                    <th class="p-4">Activity</th>
-                    <th class="p-4">Date</th>
+    {% if rsvps %}
+    <div class="bg-zinc-900 rounded-3xl overflow-hidden border border-amber-400/10">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b border-amber-400/20 text-amber-300 text-sm uppercase tracking-wider">
+                    <th class="px-8 py-5 text-left">User</th>
+                    <th class="px-8 py-5 text-left">Activity</th>
+                    <th class="px-8 py-5 text-left">Date</th>
+                    <th class="px-8 py-5 text-center">Status</th>
+                    <th class="px-8 py-5 text-center">Action</th>
                 </tr>
             </thead>
-
-            <!-- Table Body -->
             <tbody>
                 {% for rsvp in rsvps %}
-                <tr class="border-b border-zinc-800 hover:bg-zinc-800 transition">
-
-                    <td class="p-4 font-medium">
-                        {{ rsvp.user_id }}
+                <tr class="border-b border-amber-400/10 hover:bg-zinc-800 transition">
+                    <td class="px-8 py-6">
+                        <div class="font-medium">{{ rsvp.user.name }}</div>
+                        <div class="text-zinc-400 text-sm">{{ rsvp.user.email }}</div>
                     </td>
-
-                    <td class="p-4">
-                        {{ rsvp.activity_name }}
+                    <td class="px-8 py-6">{{ rsvp.itinerary.title }}</td>
+                    <td class="px-8 py-6 text-amber-300">{{ rsvp.itinerary.date_str }}</td>
+                    <td class="px-8 py-6 text-center">
+                        <span class="inline-block px-4 py-1 text-xs font-bold rounded-3xl
+                            {% if rsvp.status == 'confirmed' %}bg-emerald-500 text-black
+                            {% else %}bg-amber-400 text-black{% endif %}">
+                            {{ rsvp.status|upper }}
+                        </span>
                     </td>
-
-                    <td class="p-4 text-sm text-amber-200">
-                        {{ rsvp.created_at.strftime('%d %b %Y, %I:%M %p') }}
+                    <td class="px-8 py-6 text-center">
+                        {% if rsvp.status == 'pending' %}
+                        <a href="{{ url_for('admin.confirm_rsvp', rsvp_id=rsvp.id) }}"
+                           class="bg-amber-400 text-black px-6 py-2 rounded-3xl text-sm font-semibold hover:bg-amber-300 transition">
+                            ✅ Confirm
+                        </a>
+                        {% else %}
+                        <span class="text-emerald-400 text-sm font-medium">✅ Done</span>
+                        {% endif %}
                     </td>
-
                 </tr>
                 {% endfor %}
             </tbody>
-
         </table>
     </div>
 
-    <!-- Empty State -->
-    {% if rsvps|length == 0 %}
-    <div class="mt-6 text-center text-gray-400">
-        No RSVPs yet.
+    {% else %}
+    <div class="text-center py-20 text-amber-300 text-xl">
+        No RSVPs found.
     </div>
     {% endif %}
 

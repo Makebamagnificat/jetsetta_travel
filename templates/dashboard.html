@@ -1,20 +1,27 @@
-<!-- templates/dashboard.html -->
 {% extends "base.html" %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-6 py-12">
     <div class="flex justify-between items-end mb-12">
         <div>
-            <h1 class="text-5xl font-light tracking-tight">Welcome back, {{ current_user.name }}!</h1>
-            <p class="text-amber-300 mt-2">Here's what's happening with your trip</p>
+            <h1 class="text-5xl font-light tracking-tight">Welcome back, {{ user.name }}!</h1>
+            <p class="text-amber-300 mt-2">
+                {% if user.role == 'admin' %}
+                    Here's what's happening across all trips
+                {% else %}
+                    Here's what's happening with your trip
+                {% endif %}
+            </p>
         </div>
+        {% if user.role != 'admin' %}
         <a href="{{ url_for('user.itineraries') }}" class="gold-button px-8 py-4 rounded-3xl">View Full Itinerary</a>
+        {% endif %}
     </div>
 
     <div class="grid md:grid-cols-2 gap-8">
         <!-- Itinerary Preview -->
         <div class="bg-zinc-900 rounded-3xl p-8">
-            <h2 class="text-2xl mb-6 flex items-center gap-3"><span>📅</span> Your Itinerary</h2>
+            <h2 class="text-2xl mb-6 flex items-center gap-3"><span>📅</span> {% if user.role == 'admin' %}All Itineraries{% else %}Your Itinerary{% endif %}</h2>
             {% if itineraries %}
             <div class="space-y-6">
                 {% for item in itineraries[:3] %}
@@ -36,13 +43,16 @@
 
         <!-- Bookings Preview -->
         <div class="bg-zinc-900 rounded-3xl p-8">
-            <h2 class="text-2xl mb-6 flex items-center gap-3"><span>💳</span> Your Bookings</h2>
+            <h2 class="text-2xl mb-6 flex items-center gap-3"><span>💳</span> {% if user.role == 'admin' %}All Bookings{% else %}Your Bookings{% endif %}</h2>
             {% if bookings %}
             {% for booking in bookings %}
             <div class="flex justify-between items-center border-b border-amber-400/20 pb-4 mb-4">
                 <div>
                     <p class="font-medium">{{ booking.title }}</p>
                     <p class="text-xs text-amber-300">${{ booking.amount }}</p>
+                    {% if user.role == 'admin' %}
+                    <p class="text-xs text-gray-400">By: {{ booking.user.name }}</p>
+                    {% endif %}
                 </div>
                 <span class="px-4 py-1 text-xs rounded-3xl {% if booking.status == 'confirmed' %}bg-emerald-400 text-black{% else %}bg-amber-400 text-black{% endif %}">
                     {{ booking.status|upper }}
@@ -55,7 +65,8 @@
         </div>
     </div>
 
-    <!-- Quick Actions -->
+    <!-- Quick Actions (hide for admin if desired) -->
+    {% if user.role != 'admin' %}
     <div class="mt-16 grid grid-cols-3 gap-6">
         <a href="{{ url_for('user.itineraries') }}" class="bg-zinc-900 hover:bg-zinc-800 p-8 rounded-3xl text-center transition">
             <div class="text-4xl mb-4">🗺️</div>
@@ -70,5 +81,6 @@
             <p class="font-medium">Leave a Review</p>
         </a>
     </div>
+    {% endif %}
 </div>
 {% endblock %}

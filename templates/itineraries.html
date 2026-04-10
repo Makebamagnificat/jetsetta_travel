@@ -3,42 +3,62 @@
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-6 py-12">
-    <div class="flex justify-between items-end mb-10">
+    <div class="flex justify-between items-end mb-12">
         <div>
-            <h1 class="text-5xl font-light tracking-tight">Your Santorini Itinerary</h1>
-            <p class="text-amber-300">June 15 – 22, 2026 • Private Villa Experience</p>
+            <h1 class="text-5xl font-light tracking-tight">Your Ghana Itinerary</h1>
+            <p class="text-amber-300">$2,000 Total Package • $300 Deposit • Daily Payments of $242.86 (GHS 2,676.31)</p>
         </div>
     </div>
 
-    <div class="space-y-8 mb-16">
+    <div class="space-y-8">
         {% for item in itineraries %}
-        <div class="bg-zinc-900 rounded-3xl p-8 flex flex-col md:flex-row gap-8 card-hover">
-            <div class="md:w-32 text-center flex-shrink-0">
-                <div class="text-amber-400 text-sm">{{ item.date_str or 'TBD' }}</div>
-                <div class="text-5xl font-light mt-1">{{ item.day }}</div>
-            </div>
-            
-            <div class="flex-1">
-                <h3 class="text-2xl font-medium">{{ item.title }}</h3>
-                <p class="text-amber-200 mt-4 leading-relaxed">{{ item.description }}</p>
-            </div>
+        <div class="bg-zinc-900 rounded-3xl p-10 card-hover border border-amber-400/10">
+            <div class="flex flex-col md:flex-row gap-8 items-start">
+                
+                <!-- Date / Day -->
+                <div class="md:w-32 flex-shrink-0 text-center">
+                    <div class="text-amber-400 text-sm font-medium">{{ item.date_str }}</div>
+                    <div class="text-5xl font-light text-white mt-2">{{ item.day }}</div>
+                </div>
 
-            <div class="md:w-52">
-                <form method="POST" action="{{ url_for('user.accept_activity', itinerary_id=item.id) }}">
-                    <button type="submit" class="w-full gold-button py-6 rounded-3xl text-lg font-semibold">
-                        Accept & Join
-                    </button>
-                </form>
+                <!-- Details -->
+                <div class="flex-1">
+                    <h3 class="text-3xl font-light leading-tight">{{ item.title }}</h3>
+                    <p class="text-amber-200 mt-5 leading-relaxed">{{ item.description }}</p>
+
+                    <!-- Daily Pricing Display -->
+                    <div class="mt-8 flex gap-12">
+                        <div>
+                            <div class="text-4xl font-light text-white">$242.86</div>
+                            <div class="text-sm text-amber-300">USD per day</div>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-light text-[#e2b13d]">GHS 2,676.31</div>
+                            <div class="text-sm text-amber-300">Ghana Cedis per day</div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="mt-10 flex flex-wrap gap-4">
+                        <!-- View on Map Button - Restored -->
+                        <a href="{{ url_for('user.view_map', itinerary_id=item.id) }}" 
+                           class="flex items-center gap-3 px-8 py-4 bg-amber-400 hover:bg-amber-500 text-black rounded-3xl text-sm font-medium transition">
+                            <span>View on Map</span>
+                            <span class="text-2xl">📍</span>
+                        </a>
+
+                        <!-- Accept & Join -->
+                        <form method="POST" action="{{ url_for('user.accept_activity', itinerary_id=item.id) }}">
+                            <button type="submit" 
+                                    class="gold-button px-8 py-4 rounded-3xl text-sm font-medium flex items-center gap-3">
+                                Accept & Join
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
         {% endfor %}
-    </div>
-
-    <div class="bg-zinc-900 rounded-3xl overflow-hidden">
-        <div class="p-6 border-b border-amber-400/20">
-            <h2 class="text-2xl">Live Geographical Map</h2>
-        </div>
-        <div id="map" class="h-96 w-full"></div>
     </div>
 </div>
 {% endblock %}

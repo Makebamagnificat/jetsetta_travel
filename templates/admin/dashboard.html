@@ -24,14 +24,14 @@
         <div class="bg-zinc-900 rounded-3xl p-8 hover:bg-zinc-800 transition">
             <p class="text-amber-400 text-sm">Pending Bookings</p>
             <p class="text-2xl font-medium mt-2">Confirm pending bookings.</p>
-            <a href="{{ url_for('admin.bookings') }}" class="mt-6 inline-block bg-amber-400 text-black px-6 py-3 rounded-2xl text-sm font-semibold">View Pending</a>
+            <a href="{{ url_for('admin.pending_bookings') }}" class="mt-6 inline-block bg-amber-400 text-black px-6 py-3 rounded-2xl text-sm font-semibold">View Pending</a>
         </div>
 
         <!-- Confirmed Bookings -->
         <div class="bg-zinc-900 rounded-3xl p-8 hover:bg-zinc-800 transition">
             <p class="text-amber-400 text-sm">Confirmed Bookings</p>
             <p class="text-2xl font-medium mt-2">See all confirmed bookings.</p>
-            <a href="{{ url_for('admin.bookings') }}" class="mt-6 inline-block bg-amber-400 text-black px-6 py-3 rounded-2xl text-sm font-semibold">View Confirmed</a>
+            <a href="{{ url_for('admin.confirmed_bookings') }}" class="mt-6 inline-block bg-amber-400 text-black px-6 py-3 rounded-2xl text-sm font-semibold">View Confirmed</a>
         </div>
 
         <!-- Pending RSVPs -->
